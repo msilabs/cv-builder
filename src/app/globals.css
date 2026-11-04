@@ -3,6 +3,12 @@
 body {
   font-family: var(--font-bn), var(--font-en), system-ui, sans-serif;
 }
+html[lang="en"] body {
+  font-family: var(--font-en), var(--font-bn), system-ui, sans-serif;
+}
+html {
+  scroll-behavior: smooth;
+}
 
 .cv-page {
   font-family: var(--font-en), var(--font-bn), system-ui, sans-serif;

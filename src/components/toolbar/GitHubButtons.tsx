@@ -35,12 +35,12 @@ export function StarButton({ compact = false }: { compact?: boolean }) {
   const stars = useStars();
   return (
     <a href={REPO_URL} target="_blank" rel="noreferrer" title="GitHub-এ ⭐ দিয়ে সাপোর্ট করুন"
-      className="flex items-center overflow-hidden rounded-md border border-slate-300 bg-white text-sm text-slate-700 hover:bg-slate-50">
+      className="flex shrink-0 items-center overflow-hidden rounded-md border border-slate-300 bg-white text-sm text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">
       <span className="flex items-center gap-1.5 px-2.5 py-1.5">
         <GitHubIcon />
         <span className={compact ? "hidden sm:inline" : ""}>⭐ Star</span>
       </span>
-      {stars !== null && <span className="border-l border-slate-300 bg-slate-50 px-2 py-1.5 text-xs font-semibold tabular-nums">{stars}</span>}
+      {stars !== null && <span className="border-l border-slate-300 bg-slate-50 px-2 py-1.5 text-xs font-semibold tabular-nums dark:border-slate-700 dark:bg-slate-800">{stars}</span>}
     </a>
   );
 }

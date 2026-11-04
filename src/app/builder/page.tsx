@@ -1,5 +1,6 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { templates } from "@/components/templates";
 import { AIPanel } from "@/components/ai/AIPanel";
 import { CVSettingsPanel } from "@/components/builder/CVSettingsPanel";
 import { FileMenu } from "@/components/builder/FileMenu";
@@ -17,7 +18,7 @@ import { generatePortfolio } from "@/lib/portfolio";
 import { generateReadme, githubUsername } from "@/lib/readme";
 import { emptyCV, findSampleLeftovers, isEmptyCV, sampleCV, visibleCV } from "@/lib/sample";
 import { useStore } from "@/lib/store";
-import type { CV, SectionKey, Settings } from "@/lib/types";
+import type { CV, SectionKey, Settings, TemplateId } from "@/lib/types";
 
 const AVAILABLE: View[] = ["cv", "readme", "portfolio"];
 
@@ -32,6 +33,19 @@ export default function BuilderPage() {
   const [view, setView] = useState<View>("cv");
   const [pendingImport, setPendingImport] = useState<ImportResult | null>(null);
   useHashView(view, setView, AVAILABLE);
+
+  // হোম পেজের টেমপ্লেট গ্যালারি থেকে ?t=modern এলে সেই টেমপ্লেট বাছাই
+  useEffect(() => {
+    if (!loaded) return;
+    const params = new URLSearchParams(window.location.search);
+    const tpl = params.get("t") as TemplateId | null;
+    if (tpl && tpl in templates) {
+      setSettings((s) => ({ ...s, template: tpl }));
+      params.delete("t");
+      const q = params.toString();
+      history.replaceState(null, "", `${window.location.pathname}${q ? `?${q}` : ""}${window.location.hash}`);
+    }
+  }, [loaded, setSettings]);
 
   const hidden = hiddenOf(settings, view);
   const shownCV = useMemo(() => visibleCV(cv, hidden), [cv, hidden]);

@@ -23,11 +23,13 @@ hr{height:.25em;padding:0;margin:24px 0;background:#d1d9e0;border:0}
 h1:first-child,h2:first-child,h3:first-child{margin-top:0}
 `;
 
+export function markdownDocument(markdown: string) {
+  const body = marked.parse(markdown, { async: false, gfm: true, breaks: false }) as string;
+  // GitHub-এর মতো লিংক নতুন ট্যাবে
+  return `<!doctype html><html><head><meta charset="utf-8"><base target="_blank"><style>${CSS}</style></head><body>${body}</body></html>`;
+}
+
 export function MarkdownFrame({ markdown, title = "README preview" }: { markdown: string; title?: string }) {
-  const html = useMemo(() => {
-    const body = marked.parse(markdown, { async: false, gfm: true, breaks: false }) as string;
-    // GitHub-এর মতো লিংক নতুন ট্যাবে
-    return `<!doctype html><html><head><meta charset="utf-8"><base target="_blank"><style>${CSS}</style></head><body>${body}</body></html>`;
-  }, [markdown]);
+  const html = useMemo(() => markdownDocument(markdown), [markdown]);
   return <iframe title={title} sandbox="allow-popups allow-popups-to-escape-sandbox" srcDoc={html} className="h-full min-h-[70vh] w-full rounded-xl border border-slate-200 bg-white shadow-sm" />;
 }

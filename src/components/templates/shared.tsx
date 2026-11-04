@@ -1,3 +1,5 @@
+"use client";
+import { createContext, useContext } from "react";
 import type { CV } from "@/lib/types";
 import { href, lines, stripProtocol } from "@/lib/utils";
 
@@ -23,8 +25,12 @@ export function contactItems(cv: CV) {
   return out;
 }
 
+// থাম্বনেইলে লিংক বন্ধ: থাম্বনেইল নিজেই লিংক/বোতামের ভেতরে থাকে, আর লিংকের ভেতরে লিংক অবৈধ
+export const LinksEnabled = createContext(true);
+
 export function Ext({ url, children, className = "" }: { url?: string; children: React.ReactNode; className?: string }) {
-  if (!url) return <span className={className}>{children}</span>;
+  const enabled = useContext(LinksEnabled);
+  if (!url || !enabled) return <span className={className}>{children}</span>;
   return (
     <a href={url} className={className} target="_blank" rel="noreferrer">
       {children}
