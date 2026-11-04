@@ -23,7 +23,11 @@ import { generateReadme, githubUsername } from "@/lib/readme";
 import { emptyCV, findSampleLeftovers, isEmptyCV, sampleCV, visibleCV } from "@/lib/sample";
 import { useDialogs } from "@/components/ui/Dialogs";
 import { useLang } from "@/i18n/lang";
+import { exportProfile } from "@/lib/files";
 import { useStore } from "@/lib/store";
+import { useOtherTabs } from "@/lib/useOtherTabs";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { CrashNotice } from "@/components/builder/CrashNotice";
 import type { CV, SectionKey, Settings, TemplateId } from "@/lib/types";
 
 const AVAILABLE: View[] = ["cv", "readme", "portfolio"];
@@ -32,7 +36,9 @@ const AVAILABLE: View[] = ["cv", "readme", "portfolio"];
 const hiddenOf = (s: Settings, v: View) => (v === "readme" ? s.readme.hidden : v === "portfolio" ? s.portfolio.hidden : s.hidden);
 
 export default function BuilderPage() {
-  const { cv, setCV, settings, setSettings, loaded, profile } = useStore();
+  const { cv, setCV, settings, setSettings, loaded, profile, saveState, markBackup } = useStore();
+  const otherTabs = useOtherTabs();
+  const [otherTabsDismissed, setOtherTabsDismissed] = useState(false);
   const { t } = useLang();
   const B = t.b;
   const { confirm, toast } = useDialogs();
@@ -100,6 +106,8 @@ export default function BuilderPage() {
 
   const downloadPDF = async () => {
     if (!(await okToExport("CV"))) return;
+    // ফোনে প্রিন্ট থেকে PDF সেভ করা কঠিন, তাই আগে নির্দেশনা
+    if (window.matchMedia("(pointer: coarse)").matches && !(await confirm({ title: B.mobilePdf.title, message: B.mobilePdf.body, confirmLabel: B.mobilePdf.go }))) return;
     const prev = document.title;
     document.title = `${cv.personal.fullName || "CV"} - CV`.replace(/[\\/:*?"<>|]/g, "");
     window.print();
@@ -177,6 +185,19 @@ export default function BuilderPage() {
       <AIPanel key={aiOpen ? `open-${aiTask ?? "menu"}` : "closed"} open={aiOpen} initialTask={aiTask} onClose={() => { setAiOpen(false); setAiTask(null); }} onApplied={(prev, profileId, message) => setNotice({ prev, profileId, message })} />
       <div className="grid flex-1 lg:min-h-0 lg:grid-cols-[minmax(380px,520px)_1fr] print:block">
         <aside className={`space-y-3 overflow-y-auto p-4 pb-24 lg:h-full lg:pb-4 print:hidden ${pane === "edit" ? "" : "hidden lg:block"}`}>
+          {saveState === "error" && (
+            <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-900">
+              <p className="font-semibold">{B.storage.title}</p>
+              <p className="mt-1">{B.storage.body}</p>
+              <button type="button" className={`${btnPrimary} mt-2`} onClick={() => { exportProfile(profile); markBackup(); }}>{B.storage.backup}</button>
+            </div>
+          )}
+          {otherTabs > 0 && !otherTabsDismissed && (
+            <div role="status" className="flex items-start justify-between gap-3 rounded-xl border border-sky-200 bg-sky-50 p-3 text-sm text-sky-900">
+              <p>ℹ {B.otherTab.text}</p>
+              <button type="button" className="shrink-0 text-xs font-semibold text-sky-800 underline" onClick={() => setOtherTabsDismissed(true)}>{B.otherTab.dismiss}</button>
+            </div>
+          )}
           {notice && (
             <div className="flex items-start justify-between gap-3 rounded-xl border border-violet-200 bg-violet-50 p-3 text-sm text-violet-900">
               <p>🤖 {notice.message} {B.notice.review}</p>
@@ -205,16 +226,22 @@ export default function BuilderPage() {
           {loaded && isEmpty && (
             <WelcomeCard what={B.views[view]} onFill={focusName} onSample={() => setCV(sampleCV)} onAI={() => openAI("fromText")} onImport={openImport} />
           )}
-          {loaded && <Editor cv={cv} setCV={setCV} hidden={hidden} toggleSection={toggleSection} />}
+          {loaded && (
+            <ErrorBoundary fallback={(reset) => <CrashNotice reset={reset} />}>
+              <Editor cv={cv} setCV={setCV} hidden={hidden} toggleSection={toggleSection} />
+            </ErrorBoundary>
+          )}
           {view === "readme" && <ReadmeHowTo user={githubUsername(cv.personal.github)} />}
           {view === "portfolio" && <PortfolioHowTo github={cv.personal.github} />}
           <p className="pb-6 text-center text-[11px] text-slate-400">{B.privacy}</p>
         </aside>
 
         <main className={`overflow-y-auto bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] p-4 pb-24 [background-size:18px_18px] lg:h-full lg:pb-4 print:block print:bg-none print:h-auto print:overflow-visible print:p-0 ${pane === "preview" ? "" : "hidden lg:block"}`}>
-          {loaded && view === "cv" && <Preview cv={shownCV} settings={settings} empty={isEmpty} />}
-          {loaded && view === "readme" && <ReadmePreviewPane markdown={markdown} />}
-          {loaded && view === "portfolio" && <PortfolioPreviewPane html={portfolioHtml} />}
+          <ErrorBoundary key={view} fallback={(reset) => <CrashNotice reset={reset} />}>
+            {loaded && view === "cv" && <Preview cv={shownCV} settings={settings} empty={isEmpty} />}
+            {loaded && view === "readme" && <ReadmePreviewPane markdown={markdown} />}
+            {loaded && view === "portfolio" && <PortfolioPreviewPane html={portfolioHtml} />}
+          </ErrorBoundary>
         </main>
       </div>
     </div>

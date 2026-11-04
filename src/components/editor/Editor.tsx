@@ -2,6 +2,7 @@
 import { useDialogs } from "@/components/ui/Dialogs";
 import { useLang } from "@/i18n/lang";
 import type { CV, SectionKey, Education, Experience, Project, SimpleItem, SkillGroup } from "@/lib/types";
+import { compressImage } from "@/lib/image";
 import { cvProgress } from "@/lib/progress";
 import { commaList, fmtRange, uid } from "@/lib/utils";
 import { AddButton, Field, ItemCard, listOps, Section } from "./fields";
@@ -21,12 +22,15 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
   const edu = listOps<Education>(cv.education, (l) => set("education", l));
   const sk = listOps<SkillGroup>(cv.skills, (l) => set("skills", l));
 
-  const onPhoto = (f?: File) => {
+  // ছবি ৪০০px JPEG-এ ছোট করে রাখা হয় (সাধারণত ৩০–৬০ KB), যাতে ব্রাউজারের জায়গা না ভরে
+  const onPhoto = async (f?: File) => {
     if (!f) return;
-    if (f.size > 1.5 * 1024 * 1024) return toast(L.photoTooBig, "error");
-    const r = new FileReader();
-    r.onload = () => setP("photo", String(r.result));
-    r.readAsDataURL(f);
+    if (f.size > 15 * 1024 * 1024) return toast(L.photoTooBig, "error");
+    try {
+      setP("photo", await compressImage(f));
+    } catch {
+      toast(t.b.photo.failed, "error");
+    }
   };
 
   return (

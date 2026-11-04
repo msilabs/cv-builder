@@ -5,6 +5,7 @@ import type { CV, Settings } from "./types";
 import { defaultSettings, emptyCV } from "./sample";
 import { normalizeCV, normalizeSettings } from "./normalize";
 import { uid } from "./utils";
+import { mergeData } from "./merge";
 import { detectLang } from "@/i18n/lang";
 import { dict } from "@/i18n/dict";
 
@@ -110,6 +111,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipSave = useRef(true);
+  const dataRef = useRef(data);
+  useEffect(() => {
+    dataRef.current = data;
+  }, [data]);
 
   // ব্রাউজারের স্টোরেজ থেকে প্রথমবার লোড। static HTML-এর সাথে মিল রাখতে এটা mount-এর পরেই করতে হয়।
   useEffect(() => {
@@ -131,7 +136,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...data, savedAt: Date.now() }));
         setSaveState("saved");
         setSavedAt(Date.now());
       } catch {
@@ -140,17 +145,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }, 400);
   }, [data, loaded]);
 
-  // অন্য ট্যাবে বদলালে এখানেও আপডেট (ফেরত লেখা ছাড়া)
+  // অন্য ট্যাবে বদলালে এখানে মিলিয়ে নেওয়া: প্রতিটা ভার্সনের নতুনতম কপি থাকে
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
       if (e.key !== STORAGE_KEY || !e.newValue) return;
       try {
-        const d = normalizeData(JSON.parse(e.newValue));
+        const raw = JSON.parse(e.newValue);
+        const d = normalizeData(raw);
         if (!d) return;
-        skipSave.current = true;
-        setData(d);
-        setSaveState("saved");
-        setSavedAt(Date.now());
+        const { data: merged, localWins } = mergeData(dataRef.current, d, typeof raw.savedAt === "number" ? raw.savedAt : 0);
+        if (!localWins) {
+          // সব নতুন তথ্য অন্য ট্যাবের: এখানে আর সেভ করার দরকার নেই
+          skipSave.current = true;
+          if (timer.current) clearTimeout(timer.current);
+          setSaveState("saved");
+          setSavedAt(Date.now());
+        }
+        setData(merged);
       } catch {
         /* ignore */
       }

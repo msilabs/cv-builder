@@ -85,3 +85,29 @@ test("hiding a section removes it from the CV only", async ({ page }) => {
   await page.getByRole("switch", { name: /পড়াশোনা/ }).click();
   await expect(page.locator("#cv-page")).toContainText("Higher Secondary Certificate");
 });
+
+test("large photos are resized before saving", async ({ page }) => {
+  await openBuilder(page);
+  await page.locator('input[type="file"][accept="image/*"]').setInputFiles("tests/e2e/fixtures/big-photo.png");
+  await expect(page.locator("img[src^='data:image/jpeg']").first()).toBeVisible();
+  await expect(page.getByText("✓ সেভ হয়েছে")).toBeVisible();
+  const photo = await page.evaluate(() => JSON.parse(localStorage.getItem("cvbanao:data:v2")!).profiles[0].cv.personal.photo as string);
+  expect(photo.startsWith("data:image/jpeg")).toBe(true);
+  expect(photo.length).toBeLessThan(120_000);
+  const width = await page.evaluate(async (src) => {
+    const img = new Image();
+    img.src = src;
+    await img.decode();
+    return img.naturalWidth;
+  }, photo);
+  expect(width).toBe(400);
+});
+
+test("warns when the builder is open in another tab", async ({ page, context }) => {
+  await openBuilder(page);
+  const other = await context.newPage();
+  await other.goto("/builder/");
+  await expect(page.getByText(/অন্য একটা ট্যাবেও খোলা আছে/)).toBeVisible();
+  await page.getByRole("button", { name: "বুঝেছি" }).click();
+  await expect(page.getByText(/অন্য একটা ট্যাবেও খোলা আছে/)).toBeHidden();
+});

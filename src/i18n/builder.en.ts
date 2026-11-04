@@ -3,6 +3,24 @@ import type { builderBn } from "./builder.bn";
 const plural = (c: number, one: string, many = `${one}s`) => `${c} ${c === 1 ? one : many}`;
 
 export const builderEn: typeof builderBn = {
+  storage: {
+    title: "⚠ Cannot save",
+    body: "Your browser storage is full. Save a backup file now, then delete versions you no longer need or remove the photo.",
+    backup: "💾 Save backup file",
+  },
+  otherTab: { text: "This site is also open in another tab. Editing the same CV in both at once can lose changes from one of them.", dismiss: "Got it" },
+  crash: {
+    title: "Something went wrong",
+    body: "This part cannot be shown. Your data is still saved. Take a backup first, then try again.",
+    backup: "💾 Save backup file",
+    retry: "↻ Try again",
+  },
+  mobilePdf: {
+    title: "Saving a PDF on your phone",
+    body: "1. The print screen opens next.\n2. Choose \"Save as PDF\" as the printer.\n3. On iPhone: pinch out on the print preview, then use Share → \"Save to Files\".",
+    go: "Make PDF",
+  },
+  photo: { processing: "Resizing photo…", failed: "Could not read that image, please try another" },
   dialogs: { ok: "OK", cancel: "Cancel", continue: "Continue anyway", delete: "Delete", load: "Load", save: "Save", clear: "Clear all" },
   toast: {
     copied: "Copied",
@@ -164,7 +182,7 @@ export const builderEn: typeof builderBn = {
     openToWork: "🟢 Looking for a new job (shows \"Open to work\" in README and portfolio)",
     photo: "Upload photo (optional)",
     photoRemove: "Remove",
-    photoTooBig: "The photo must be smaller than 1.5 MB",
+    photoTooBig: "The photo must be smaller than 15 MB",
     photoTip: "Tip: for international or remote jobs a CV without a photo is usually better. Modern, Timeline and Minimal templates can show one.",
     summary: "Professional summary",
     summaryLabel: "Introduce yourself in 2–4 lines",
