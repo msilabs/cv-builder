@@ -1,11 +1,11 @@
 import Link from "next/link";
-import { TemplateThumb } from "@/components/builder/TemplateThumb";
-import { templates } from "@/components/templates";
+import Image from "next/image";
 import { StarButton } from "@/components/toolbar/GitHubButtons";
 import { dict, type Lang } from "@/i18n/dict";
 import { ISSUES_URL, REPO_URL } from "@/lib/site";
-import type { TemplateId } from "@/lib/types";
+import { TEMPLATE_ATS, TEMPLATE_IDS } from "@/lib/templateMeta";
 import { HeroShowcase } from "./HeroShowcase";
+import { templateImages } from "./previewImages";
 import { HomeLangSwitch, LangRedirect } from "./LangLinks";
 
 const Eyebrow = ({ children }: { children: React.ReactNode }) => (
@@ -27,7 +27,7 @@ const VIEW_HASH: Record<string, string> = { cv: "", readme: "#readme", portfolio
 export function HomePage({ lang }: { lang: Lang }) {
   const t = dict[lang];
   const h = t.home;
-  const ids = Object.keys(templates) as TemplateId[];
+  const ids = TEMPLATE_IDS;
   const primaryBtn = "inline-flex items-center justify-center gap-2 rounded-xl bg-teal-700 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-teal-700/25 transition hover:bg-teal-800 hover:shadow-teal-700/35 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700";
   const secondaryBtn = "inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-6 py-3 text-base font-semibold text-slate-800 transition hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800";
 
@@ -76,7 +76,7 @@ export function HomePage({ lang }: { lang: Lang }) {
               </div>
               <p className="mt-3 text-sm text-slate-500">{h.hero.note}</p>
             </div>
-            <HeroShowcase />
+            <HeroShowcase alt={h.previewAlt} />
           </div>
         </section>
 
@@ -122,14 +122,14 @@ export function HomePage({ lang }: { lang: Lang }) {
                 <Link key={id} href={`/builder?t=${id}`}
                   className="group rounded-2xl border border-slate-200 bg-white p-3 transition hover:-translate-y-0.5 hover:border-teal-400 hover:shadow-xl sm:p-4 dark:border-slate-800 dark:bg-slate-900">
                   <div className="flex justify-center overflow-hidden rounded-lg bg-slate-100 p-3 sm:p-5 dark:bg-slate-800">
-                    <div className="shadow-md transition duration-300 group-hover:scale-[1.02]">
-                      <TemplateThumb id={id} accent="#0f766e" width={220} />
+                    <div className="overflow-hidden bg-white shadow-md transition duration-300 group-hover:scale-[1.02]">
+                      <Image src={templateImages[id]} alt={h.templates.alt(t.tpl[id].name)} width={220} height={311} sizes="(min-width: 1024px) 220px, 40vw" className="block h-auto w-full max-w-[220px]" />
                     </div>
                   </div>
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     <span className="font-semibold text-slate-900 dark:text-white">{t.tpl[id].name}</span>
-                    <span className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${templates[id].ats ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300" : "bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-300"}`}>
-                      {templates[id].ats ? h.templates.ats : h.templates.design}
+                    <span className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${TEMPLATE_ATS[id] ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300" : "bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-300"}`}>
+                      {TEMPLATE_ATS[id] ? h.templates.ats : h.templates.design}
                     </span>
                   </div>
                   <p className="mt-0.5 text-sm text-slate-500">{t.tpl[id].desc}</p>

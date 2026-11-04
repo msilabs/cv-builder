@@ -2,8 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { detectLang, saveLang, storedLang } from "@/i18n/lang";
-import type { Lang } from "@/i18n/dict";
+import { detectLang, type Lang, saveLang, storedLang } from "@/i18n/detect";
 
 // হোম পেজে ভাষা বদলালে / আর /en/ এর মধ্যে যাওয়া, পছন্দ মনে রাখা
 export function HomeLangSwitch({ lang }: { lang: Lang }) {

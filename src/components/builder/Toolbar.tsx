@@ -30,8 +30,8 @@ export function Toolbar({ left, center, right }: { left?: React.ReactNode; cente
           {right}
           <div className="hidden items-center gap-2 xl:flex">
             <LangToggle lang={lang} onChange={setLang} />
-            <IssueLink />
-            <StarButton compact />
+            <IssueLink label={t.b.github.issue} title={t.b.github.issueTitle} />
+            <StarButton compact title={t.b.github.starTitle} />
           </div>
           <div className="xl:hidden">
             <Menu caret={false} ariaLabel={t.b.toolbar.more} buttonClass={`${btnGhost} w-9 px-0 text-lg`} label={<span aria-hidden>⋯</span>}>

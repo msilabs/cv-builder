@@ -44,6 +44,7 @@ export const bn = {
       ats: "ATS-বান্ধব",
       design: "ডিজাইন",
       use: "এটা দিয়ে শুরু করুন →",
+      alt: (name: string) => `${name} টেমপ্লেটে বানানো নমুনা CV`,
     },
     ai: {
       eyebrow: "AI সহায়তা",
@@ -99,5 +100,6 @@ export const bn = {
     final: { title: "আজই আপনার ডেভেলপার প্রোফাইল গুছিয়ে নিন", sub: "একবার তথ্য দিলেই CV, GitHub README আর পোর্টফোলিও।", cta: "ফ্রিতে শুরু করুন" },
     footer: { made: "বাংলাদেশে তৈরি", issue: "সমস্যা জানান", license: "MIT লাইসেন্স" },
     preview: { cv: "CV", readme: "README.md", portfolio: "পোর্টফোলিও" },
+    previewAlt: { cv: "ক্লাসিক টেমপ্লেটে নমুনা CV", readme: "কোড স্টাইলে তৈরি GitHub প্রোফাইল README", portfolio: "মিডনাইট থিমে তৈরি পোর্টফোলিও ওয়েবসাইট" },
   },
 };

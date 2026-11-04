@@ -11,6 +11,7 @@ export function Menu({ label, children, align = "right", badge, buttonClass, ari
   const panel = useRef<HTMLDivElement>(null);
 
   const items = () => [...(panel.current?.querySelectorAll<HTMLElement>('[role="menuitem"], a[href], button') ?? [])];
+  const dismiss = () => setOpen(false);
   const close = (refocus = false) => {
     setOpen(false);
     if (refocus) btn.current?.focus();
@@ -60,7 +61,7 @@ export function Menu({ label, children, align = "right", badge, buttonClass, ari
       </button>
       {open && (
         <div ref={panel} role="menu" className={`absolute z-40 mt-1.5 min-w-56 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-slate-900/10 ${align === "right" ? "right-0" : "left-0"}`}>
-          {children(() => close())}
+          {children(dismiss)}
         </div>
       )}
     </div>

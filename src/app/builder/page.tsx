@@ -1,74 +1,62 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { btnAI, btnOutline, btnPrimary } from "@/components/ui/styles";
-import type { AITask } from "@/lib/ai";
-import { templates } from "@/components/templates";
+// বিল্ডার পেজ: টুলবার, বাঁ পাশে ফর্ম, ডান পাশে CV / README / পোর্টফোলিওর প্রিভিউ
+import { useMemo, useRef, useState } from "react";
 import { AIPanel } from "@/components/ai/AIPanel";
+import { type AINotice, BuilderNotices } from "@/components/builder/BuilderNotices";
+import { CrashNotice } from "@/components/builder/CrashNotice";
 import { CVSettingsPanel } from "@/components/builder/CVSettingsPanel";
-import { ProgressCard } from "@/components/builder/ProgressCard";
-import { WelcomeCard } from "@/components/builder/WelcomeCard";
+import { ExportActions } from "@/components/builder/ExportActions";
 import { FileMenu } from "@/components/builder/FileMenu";
 import { ImportDialog } from "@/components/builder/ImportDialog";
+import { MobilePaneSwitch, type Pane } from "@/components/builder/MobilePaneSwitch";
+import { ProgressCard } from "@/components/builder/ProgressCard";
 import { Toolbar } from "@/components/builder/Toolbar";
+import { useTemplateFromQuery } from "@/components/builder/useTemplateFromQuery";
 import { VersionSwitcher } from "@/components/builder/VersionSwitcher";
 import { useHashView, type View, ViewTabs } from "@/components/builder/ViewTabs";
+import { WelcomeCard } from "@/components/builder/WelcomeCard";
 import Editor from "@/components/editor/Editor";
-import Preview from "@/components/Preview";
 import { PortfolioHowTo, PortfolioPreviewPane, PortfolioSettingsPanel } from "@/components/portfolio/PortfolioPanels";
-import { ReadmeHowTo, ReadmePreviewPane, ReadmeSettingsPanel, useReadmeActions } from "@/components/readme/ReadmePanels";
-import { downloadText } from "@/lib/files";
+import Preview from "@/components/Preview";
+import { ReadmeHowTo, ReadmePreviewPane, ReadmeSettingsPanel } from "@/components/readme/ReadmePanels";
+import { useDialogs } from "@/components/ui/Dialogs";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
+import { btnAI } from "@/components/ui/styles";
+import { useLang } from "@/i18n/lang";
+import type { AITask } from "@/lib/ai";
 import { type ImportResult, readImportFile } from "@/lib/normalize";
 import { generatePortfolio } from "@/lib/portfolio";
 import { generateReadme, githubUsername } from "@/lib/readme";
-import { emptyCV, findSampleLeftovers, isEmptyCV, sampleCV, visibleCV } from "@/lib/sample";
-import { useDialogs } from "@/components/ui/Dialogs";
-import { useLang } from "@/i18n/lang";
-import { exportProfile } from "@/lib/files";
+import { findSampleLeftovers, isEmptyCV, sampleCV, visibleCV } from "@/lib/sample";
 import { useStore } from "@/lib/store";
-import { useOtherTabs } from "@/lib/useOtherTabs";
-import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
-import { CrashNotice } from "@/components/builder/CrashNotice";
-import type { CV, SectionKey, Settings, TemplateId } from "@/lib/types";
+import type { SectionKey, Settings } from "@/lib/types";
 
 const AVAILABLE: View[] = ["cv", "readme", "portfolio"];
 
-// কোন ট্যাবের "দেখাও/লুকাও" তালিকা
+// কোন ট্যাবের "দেখান/লুকান" তালিকা
 const hiddenOf = (s: Settings, v: View) => (v === "readme" ? s.readme.hidden : v === "portfolio" ? s.portfolio.hidden : s.hidden);
 
 export default function BuilderPage() {
-  const { cv, setCV, settings, setSettings, loaded, profile, saveState, markBackup } = useStore();
-  const otherTabs = useOtherTabs();
-  const [otherTabsDismissed, setOtherTabsDismissed] = useState(false);
+  const { cv, setCV, settings, setSettings, loaded } = useStore();
   const { t } = useLang();
   const B = t.b;
-  const { confirm, toast } = useDialogs();
+  const { toast } = useDialogs();
+  const [view, setView] = useState<View>("cv");
+  const [pane, setPane] = useState<Pane>("edit");
   const [aiOpen, setAiOpen] = useState(false);
   const [aiTask, setAiTask] = useState<AITask | null>(null);
-  const importRef = useRef<HTMLInputElement>(null);
-  const [notice, setNotice] = useState<{ message: string; prev: CV; profileId: string } | null>(null);
-  const [pane, setPane] = useState<"edit" | "preview">("edit");
-  const [view, setView] = useState<View>("cv");
+  const [notice, setNotice] = useState<AINotice | null>(null);
   const [pendingImport, setPendingImport] = useState<ImportResult | null>(null);
+  const importRef = useRef<HTMLInputElement>(null);
   useHashView(view, setView, AVAILABLE);
-
-  // হোম পেজের টেমপ্লেট গ্যালারি থেকে ?t=modern এলে সেই টেমপ্লেট বাছাই
-  useEffect(() => {
-    if (!loaded) return;
-    const params = new URLSearchParams(window.location.search);
-    const tpl = params.get("t") as TemplateId | null;
-    if (tpl && tpl in templates) {
-      setSettings((s) => ({ ...s, template: tpl }));
-      params.delete("t");
-      const q = params.toString();
-      history.replaceState(null, "", `${window.location.pathname}${q ? `?${q}` : ""}${window.location.hash}`);
-    }
-  }, [loaded, setSettings]);
+  useTemplateFromQuery(loaded, setSettings);
 
   const hidden = hiddenOf(settings, view);
   const shownCV = useMemo(() => visibleCV(cv, hidden), [cv, hidden]);
   const leftovers = findSampleLeftovers(shownCV).map((k) => B.leftover.fields[k]);
   const isEmpty = isEmptyCV(cv);
   const markdown = useMemo(() => (view === "readme" ? generateReadme(shownCV, settings.readme) : ""), [view, shownCV, settings.readme]);
+  const portfolioHtml = useMemo(() => (view === "portfolio" ? generatePortfolio(shownCV, settings.portfolio) : ""), [view, shownCV, settings.portfolio]);
 
   const toggleSection = (k: SectionKey) =>
     setSettings((s) => {
@@ -79,76 +67,31 @@ export default function BuilderPage() {
       return { ...s, hidden: next };
     });
 
+  // খালি ভার্সনে সরাসরি বসানো, নইলে কোথায় রাখবে জিজ্ঞেস করা
   const onImport = (r: ImportResult) => {
-    if (isEmpty) {
-      setCV(r.cv);
-      if (r.settings) setSettings(r.settings);
-      toast(B.toast.imported);
-    } else setPendingImport(r);
-  };
-
-  const okToExport = async (what: string) =>
-    !leftovers.length || (await confirm({ message: B.confirmLeftover(what, leftovers.join(", ")), confirmLabel: B.dialogs.continue }));
-
-  const portfolioHtml = useMemo(() => (view === "portfolio" ? generatePortfolio(shownCV, settings.portfolio) : ""), [view, shownCV, settings.portfolio]);
-  const downloadPortfolio = async () => {
-    if (!(await okToExport(B.views.portfolio))) return;
-    downloadText("index.html", portfolioHtml, "text/html");
-    toast(B.toast.downloaded);
-  };
-  const openPortfolio = () => {
-    const url = URL.createObjectURL(new Blob([portfolioHtml], { type: "text/html" }));
-    window.open(url, "_blank", "noopener");
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
-  };
-
-  const readme = useReadmeActions(markdown, () => okToExport("README"));
-
-  const downloadPDF = async () => {
-    if (!(await okToExport("CV"))) return;
-    // ফোনে প্রিন্ট থেকে PDF সেভ করা কঠিন, তাই আগে নির্দেশনা
-    if (window.matchMedia("(pointer: coarse)").matches && !(await confirm({ title: B.mobilePdf.title, message: B.mobilePdf.body, confirmLabel: B.mobilePdf.go }))) return;
-    const prev = document.title;
-    document.title = `${cv.personal.fullName || "CV"} - CV`.replace(/[\\/:*?"<>|]/g, "");
-    window.print();
-    setTimeout(() => (document.title = prev), 500);
-  };
-
-  const primary = btnPrimary;
-  const secondary = `${btnOutline} hidden sm:inline-flex`;
-  const openAI = (task: AITask | null = null) => {
-    setAiTask(task);
-    setAiOpen(true);
+    if (!isEmpty) return setPendingImport(r);
+    setCV(r.cv);
+    if (r.settings) setSettings(r.settings);
+    toast(B.toast.imported);
   };
   const importFile = async (f?: File) => {
     if (!f) return;
     try {
       onImport(await readImportFile(f));
     } catch (e) {
-      const m = (e as Error).message;
-      toast(B.file.openError(B.errors[m] ?? B.errors.parse), "error");
+      toast(B.file.openError(B.errors[(e as Error).message] ?? B.errors.parse), "error");
     }
   };
   const openImport = () => importRef.current?.click();
+  const openAI = (task: AITask | null = null) => {
+    setAiTask(task);
+    setAiOpen(true);
+  };
   const focusName = () => {
     const el = document.getElementById("field-fullName");
     el?.scrollIntoView({ behavior: "smooth", block: "center" });
     el?.focus({ preventScroll: true });
   };
-  const actions =
-    view === "readme" ? (
-      <>
-        <button className={secondary} onClick={readme.download}>{B.actions.md}</button>
-        <button className={primary} onClick={readme.copy}>{readme.copied ? B.actions.copied : B.actions.copyReadme}</button>
-      </>
-    ) : view === "portfolio" ? (
-      <>
-        <button className={secondary} onClick={openPortfolio}>{B.actions.openTab}</button>
-        <button className={primary} onClick={downloadPortfolio}>{B.actions.html}</button>
-      </>
-    ) : (
-      <button className={primary} onClick={downloadPDF}>⬇ {B.actions.pdf}<span className="hidden xl:inline">{B.actions.download}</span></button>
-    );
 
   return (
     <div className="flex min-h-screen flex-col bg-slate-100 lg:h-screen lg:overflow-hidden print:block print:h-auto print:overflow-visible print:bg-white">
@@ -162,67 +105,25 @@ export default function BuilderPage() {
                 <span aria-hidden>🤖</span> <span className="hidden lg:inline">{B.actions.ai}</span>
               </button>
               <FileMenu isEmpty={isEmpty} onImport={onImport} />
-              {actions}
+              <ExportActions view={view} markdown={markdown} portfolioHtml={portfolioHtml} leftovers={leftovers} fullName={cv.personal.fullName} />
             </>
           }
         />
       </header>
 
-      {/* মোবাইল/ট্যাবলেটে নিচে ভাসমান এডিট/প্রিভিউ */}
-      <div className="fixed inset-x-0 bottom-4 z-30 flex justify-center lg:hidden print:hidden">
-        <div className="flex rounded-full border border-slate-200 bg-white/95 p-1 shadow-xl shadow-slate-900/15 backdrop-blur">
-          {(["edit", "preview"] as const).map((k) => (
-            <button key={k} type="button" onClick={() => { setPane(k); window.scrollTo({ top: 0 }); }} aria-pressed={pane === k}
-              className={`rounded-full px-5 py-2 text-sm font-semibold transition ${pane === k ? "bg-teal-700 text-white" : "text-slate-600"}`}>
-              {B.pane[k]}
-            </button>
-          ))}
-        </div>
-      </div>
+      <MobilePaneSwitch pane={pane} setPane={setPane} />
       <input ref={importRef} type="file" accept="application/json,.json,.txt" className="hidden" onChange={(e) => { importFile(e.target.files?.[0]); e.target.value = ""; }} />
-
       <ImportDialog result={pendingImport} onClose={() => setPendingImport(null)} />
-      <AIPanel key={aiOpen ? `open-${aiTask ?? "menu"}` : "closed"} open={aiOpen} initialTask={aiTask} onClose={() => { setAiOpen(false); setAiTask(null); }} onApplied={(prev, profileId, message) => setNotice({ prev, profileId, message })} />
+      <AIPanel key={aiOpen ? `open-${aiTask ?? "menu"}` : "closed"} open={aiOpen} initialTask={aiTask}
+        onClose={() => { setAiOpen(false); setAiTask(null); }} onApplied={(prev, profileId, message) => setNotice({ prev, profileId, message })} />
+
       <div className="grid flex-1 lg:min-h-0 lg:grid-cols-[minmax(380px,520px)_1fr] print:block">
         <aside className={`space-y-3 overflow-y-auto p-4 pb-24 lg:h-full lg:pb-4 print:hidden ${pane === "edit" ? "" : "hidden lg:block"}`}>
-          {saveState === "error" && (
-            <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-900">
-              <p className="font-semibold">{B.storage.title}</p>
-              <p className="mt-1">{B.storage.body}</p>
-              <button type="button" className={`${btnPrimary} mt-2`} onClick={() => { exportProfile(profile); markBackup(); }}>{B.storage.backup}</button>
-            </div>
-          )}
-          {otherTabs > 0 && !otherTabsDismissed && (
-            <div role="status" className="flex items-start justify-between gap-3 rounded-xl border border-sky-200 bg-sky-50 p-3 text-sm text-sky-900">
-              <p>ℹ {B.otherTab.text}</p>
-              <button type="button" className="shrink-0 text-xs font-semibold text-sky-800 underline" onClick={() => setOtherTabsDismissed(true)}>{B.otherTab.dismiss}</button>
-            </div>
-          )}
-          {notice && (
-            <div className="flex items-start justify-between gap-3 rounded-xl border border-violet-200 bg-violet-50 p-3 text-sm text-violet-900">
-              <p>🤖 {notice.message} {B.notice.review}</p>
-              <div className="flex shrink-0 gap-2">
-                {notice.profileId && notice.profileId === profile.id && (
-                  <button type="button" className="rounded-md bg-white px-2 py-1 text-xs font-semibold text-violet-800 ring-1 ring-violet-300 hover:bg-violet-100"
-                    onClick={() => { setCV(notice.prev); setNotice(null); }}>{B.notice.undo}</button>
-                )}
-                <button type="button" aria-label={B.actions.close} className="px-1 text-violet-400 hover:text-violet-700" onClick={() => setNotice(null)}>✕</button>
-              </div>
-            </div>
-          )}
+          <BuilderNotices notice={notice} onDismissNotice={() => setNotice(null)} leftovers={leftovers} />
           {loaded && !isEmpty && <ProgressCard cv={cv} />}
           {view === "cv" && <CVSettingsPanel />}
           {view === "readme" && <ReadmeSettingsPanel />}
           {view === "portfolio" && <PortfolioSettingsPanel />}
-          {loaded && leftovers.length > 0 && (
-            <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-              <p className="font-semibold">{B.leftover.title}</p>
-              <p className="mt-1">{B.leftover.body} <b>{leftovers.join(", ")}</b></p>
-              <button className="mt-2 rounded-md bg-amber-700 px-3 py-1 text-xs font-semibold text-white hover:bg-amber-800" onClick={async () => (await confirm({ message: B.leftover.confirmClear, confirmLabel: B.dialogs.clear, danger: true })) && setCV(emptyCV)}>
-                {B.leftover.clear}
-              </button>
-            </div>
-          )}
           {loaded && isEmpty && (
             <WelcomeCard what={B.views[view]} onFill={focusName} onSample={() => setCV(sampleCV)} onAI={() => openAI("fromText")} onImport={openImport} />
           )}
@@ -236,7 +137,7 @@ export default function BuilderPage() {
           <p className="pb-6 text-center text-[11px] text-slate-500">{B.privacy}</p>
         </aside>
 
-        <main className={`overflow-y-auto bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] p-4 pb-24 [background-size:18px_18px] lg:h-full lg:pb-4 print:block print:bg-none print:h-auto print:overflow-visible print:p-0 ${pane === "preview" ? "" : "hidden lg:block"}`}>
+        <main className={`overflow-y-auto bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] p-4 pb-24 [background-size:18px_18px] lg:h-full lg:pb-4 print:block print:h-auto print:overflow-visible print:bg-none print:p-0 ${pane === "preview" ? "" : "hidden lg:block"}`}>
           <ErrorBoundary key={view} fallback={(reset) => <CrashNotice reset={reset} />}>
             {loaded && view === "cv" && <Preview cv={shownCV} settings={settings} empty={isEmpty} />}
             {loaded && view === "readme" && <ReadmePreviewPane markdown={markdown} />}

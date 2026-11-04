@@ -23,9 +23,9 @@ export const metadata: Metadata = {
     description: m.description,
     url: "/",
     locale: "bn_BD",
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "CVবানাও" }],
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "CVবানাও" }],
   },
-  twitter: { card: "summary_large_image", title: m.title, description: m.description, images: ["/og.png"] },
+  twitter: { card: "summary_large_image", title: m.title, description: m.description, images: ["/og.jpg"] },
 };
 
 export const viewport: Viewport = {

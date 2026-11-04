@@ -3,6 +3,7 @@ import { useLang } from "@/i18n/lang";
 import { useState } from "react";
 import { templates } from "@/components/templates";
 import { useStore } from "@/lib/store";
+import { TEMPLATE_ATS } from "@/lib/templateMeta";
 import type { TemplateId } from "@/lib/types";
 import { TemplateThumb } from "./TemplateThumb";
 
@@ -35,7 +36,7 @@ export function CVSettingsPanel() {
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{L.heading}</p>
           <p className="mt-0.5 text-sm font-semibold text-slate-800">
-            {t.tpl[settings.template].name} <AtsBadge ats={current.ats} label={current.ats ? L.ats : L.design} />
+            {t.tpl[settings.template].name} <AtsBadge ats={TEMPLATE_ATS[settings.template]} label={TEMPLATE_ATS[settings.template] ? L.ats : L.design} />
           </p>
         </div>
         <button type="button" onClick={() => setOpen(!open)} aria-expanded={open}
@@ -49,7 +50,7 @@ export function CVSettingsPanel() {
             <button key={id} type="button" onClick={() => setSettings((s) => ({ ...s, template: id }))}
               className={`rounded-lg border p-1.5 text-left transition ${settings.template === id ? "border-teal-600 bg-teal-50 ring-2 ring-teal-600" : "border-slate-200 hover:border-slate-400"}`}>
               <TemplateThumb id={id} accent={settings.accent} width={136} />
-              <span className="mt-1.5 block text-xs font-semibold text-slate-800">{t.tpl[id].name} <AtsBadge ats={templates[id].ats} label={templates[id].ats ? L.ats : L.design} /></span>
+              <span className="mt-1.5 block text-xs font-semibold text-slate-800">{t.tpl[id].name} <AtsBadge ats={TEMPLATE_ATS[id]} label={TEMPLATE_ATS[id] ? L.ats : L.design} /></span>
               <span className="block text-[10.5px] leading-snug text-slate-500">{t.tpl[id].desc}</span>
             </button>
           ))}

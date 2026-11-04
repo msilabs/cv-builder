@@ -45,6 +45,7 @@ export const en: Dict = {
       ats: "ATS-safe",
       design: "Design",
       use: "Start with this →",
+      alt: (name: string) => `Sample CV in the ${name} template`,
     },
     ai: {
       eyebrow: "AI assistant",
@@ -100,5 +101,6 @@ export const en: Dict = {
     final: { title: "Get your developer profile in shape today", sub: "CV, GitHub README and portfolio from one set of details.", cta: "Start for free" },
     footer: { made: "Made in Bangladesh", issue: "Report an issue", license: "MIT License" },
     preview: { cv: "CV", readme: "README.md", portfolio: "Portfolio" },
+    previewAlt: { cv: "Sample CV in the Classic template", readme: "GitHub profile README in the code style", portfolio: "Portfolio website in the Midnight theme" },
   },
 };
