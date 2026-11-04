@@ -103,7 +103,7 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
             </div>
           </ItemCard>
         ))}
-        <AddButton onClick={() => proj.add({ id: uid(), name: "", tech: "", link: "", repo: "", bullets: "" })}>প্রজেক্ট যোগ করুন</AddButton>
+        <AddButton onClick={() => proj.add({ id: uid(), name: "", tech: "", link: "", repo: "", featured: false, bullets: "" })}>প্রজেক্ট যোগ করুন</AddButton>
       </Section>
 
       <Section {...vis("education")} title="শিক্ষা" icon="🎓" count={cv.education.length}>

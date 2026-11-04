@@ -8,6 +8,11 @@ export interface Personal {
   linkedin: string;
   website: string;
   photo: string; // data URL (ঐচ্ছিক)
+  tagline: string; // এক লাইনের পরিচিতি (README/পোর্টফোলিও)
+  twitter: string;
+  blog: string;
+  codeforces: string; // username
+  leetcode: string; // username
 }
 
 export interface Experience {
@@ -27,6 +32,7 @@ export interface Project {
   tech: string;
   link: string;
   repo: string;
+  featured: boolean; // README/পোর্টফোলিওতে আগে দেখাবে
   bullets: string;
 }
 
@@ -60,17 +66,38 @@ export interface CV {
   achievements: SimpleItem[];
   certifications: SimpleItem[];
   languages: string;
+  openToWork: boolean;
 }
 
 export type SectionKey = "summary" | "skills" | "experience" | "projects" | "education" | "achievements" | "certifications" | "languages";
 
 export type TemplateId = "classic" | "modern" | "minimal";
 
+export type ReadmeStyle = "classic" | "centered" | "code" | "minimal";
+export type PortfolioTheme = "clean" | "midnight" | "bento";
+
+export interface ReadmeSettings {
+  style: ReadmeStyle;
+  showStats: boolean; // github-readme-stats কার্ড (বাইরের সার্ভিস)
+  hidden: SectionKey[];
+}
+
+export interface PortfolioSettings {
+  theme: PortfolioTheme;
+  showEmail: boolean;
+  showPhone: boolean; // পাবলিক সাইট, তাই ডিফল্ট বন্ধ
+  showLocation: boolean;
+  showPhoto: boolean;
+  hidden: SectionKey[];
+}
+
 export interface Settings {
   template: TemplateId;
   accent: string;
   showPhoto: boolean;
   hidden: SectionKey[]; // CV থেকে লুকানো সেকশন
+  readme: ReadmeSettings;
+  portfolio: PortfolioSettings;
 }
 
 export interface TemplateProps {

@@ -1,0 +1,29 @@
+name: 🐞 সমস্যা জানান (Bug report)
+description: কিছু ঠিকমতো কাজ করছে না
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: কী সমস্যা হচ্ছে?
+      description: কী করতে গিয়ে কী হলো, আর কী হওয়ার কথা ছিল।
+      placeholder: PDF ডাউনলোড করলে দ্বিতীয় পৃষ্ঠা ফাঁকা আসছে...
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: কীভাবে আবার ঘটানো যায়?
+      placeholder: |
+        1. মডার্ন টেমপ্লেট বাছাই করুন
+        2. ...
+  - type: input
+    id: browser
+    attributes:
+      label: ব্রাউজার ও ডিভাইস
+      placeholder: Chrome 130, Android
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: স্ক্রিনশট (ঐচ্ছিক)
+      description: ব্যক্তিগত তথ্য (ফোন, ইমেইল) ঢেকে দিন।

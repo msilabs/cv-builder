@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { StarButton } from "@/components/toolbar/GitHubButtons";
+import { ISSUES_URL, REPO_URL } from "@/lib/site";
 
 const features = [
   { icon: "🤖", title: "ATS-বান্ধব", text: "বাংলাদেশি ও বিদেশি কোম্পানির ATS সফটওয়্যার সহজে পড়তে পারে এমন ফরম্যাট। PDF-এর লেখা সিলেক্ট করা যায়।" },
@@ -14,7 +16,10 @@ export default function Home() {
     <div className="min-h-screen bg-white text-slate-800">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <span className="text-xl font-bold text-teal-700">CV<span className="text-slate-800">বানাও</span></span>
-        <Link href="/builder" className="rounded-md bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800">CV বানান</Link>
+        <div className="flex items-center gap-2">
+          <StarButton compact />
+          <Link href="/builder" className="rounded-md bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800">CV বানান</Link>
+        </div>
       </nav>
 
       <section className="mx-auto max-w-6xl px-4 pb-16 pt-12 text-center sm:pt-20">
@@ -52,7 +57,13 @@ export default function Home() {
         </ul>
       </section>
 
-      <footer className="border-t border-slate-200 py-6 text-center text-sm text-slate-500">© {new Date().getFullYear()} CVবানাও · বাংলাদেশে তৈরি</footer>
+      <footer className="border-t border-slate-200 py-6 text-center text-sm text-slate-500">
+        <p>© {new Date().getFullYear()} CVবানাও · বাংলাদেশে তৈরি · ওপেন সোর্স (MIT)</p>
+        <p className="mt-2 space-x-4">
+          <a className="hover:text-teal-700" href={REPO_URL} target="_blank" rel="noreferrer">GitHub</a>
+          <a className="hover:text-teal-700" href={ISSUES_URL} target="_blank" rel="noreferrer">সমস্যা জানান</a>
+        </p>
+      </footer>
     </div>
   );
 }

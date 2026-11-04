@@ -1,7 +1,7 @@
 import type { CV, SectionKey, Settings } from "./types";
 
 export const emptyCV: CV = {
-  personal: { fullName: "", title: "", email: "", phone: "", location: "", github: "", linkedin: "", website: "", photo: "" },
+  personal: { fullName: "", title: "", email: "", phone: "", location: "", github: "", linkedin: "", website: "", photo: "", tagline: "", twitter: "", blog: "", codeforces: "", leetcode: "" },
   summary: "",
   skills: [],
   experience: [],
@@ -10,9 +10,17 @@ export const emptyCV: CV = {
   achievements: [],
   certifications: [],
   languages: "",
+  openToWork: false,
 };
 
-export const defaultSettings: Settings = { template: "classic", accent: "#0f766e", showPhoto: false, hidden: [] };
+export const defaultSettings: Settings = {
+  template: "classic",
+  accent: "#0f766e",
+  showPhoto: false,
+  hidden: [],
+  readme: { style: "classic", showStats: false, hidden: ["education", "languages"] },
+  portfolio: { theme: "clean", showEmail: true, showPhone: false, showLocation: true, showPhoto: true, hidden: [] },
+};
 
 export const sampleCV: CV = {
   personal: {
@@ -25,6 +33,11 @@ export const sampleCV: CV = {
     linkedin: "linkedin.com/in/tanvir-dev",
     website: "tanvir.dev",
     photo: "",
+    tagline: "Building fintech & mobile products from Dhaka 🇧🇩",
+    twitter: "",
+    blog: "",
+    codeforces: "tanvir_cf",
+    leetcode: "",
   },
   summary:
     "Full stack developer with 3+ years of experience building scalable web and mobile applications using React, Next.js, Node.js and Flutter. Shipped fintech and e-commerce products used by 200k+ users across Bangladesh.",
@@ -66,6 +79,7 @@ export const sampleCV: CV = {
       tech: "Flutter, Firebase, Google Maps API",
       link: "play.google.com/store/apps/details?id=com.buskoi",
       repo: "github.com/tanvir-dev/buskoi",
+      featured: true,
       bullets: "Route finder for 150+ Dhaka city bus routes with Bangla & English support\n4.6★ rating with 25k+ downloads on Google Play",
     },
     {
@@ -74,6 +88,7 @@ export const sampleCV: CV = {
       tech: "Next.js, PostgreSQL, Prisma",
       link: "devjobs-bd.vercel.app",
       repo: "github.com/tanvir-dev/devjobs-bd",
+      featured: true,
       bullets: "Job board aggregating tech jobs from Bangladeshi companies with salary insights",
     },
   ],
@@ -102,6 +117,7 @@ export const sampleCV: CV = {
   ],
   certifications: [{ id: "c1", text: "AWS Certified Cloud Practitioner (2024)" }],
   languages: "Bangla (Native), English (Professional)",
+  openToWork: true,
 };
 
 // CV-তে নমুনার কোন লেখা এখনো রয়ে গেছে তা খুঁজে বের করে (ভুলে রেখে দেওয়া আটকাতে)
@@ -146,3 +162,6 @@ export function visibleCV(cv: CV, hidden: SectionKey[]): CV {
   }
   return out;
 }
+
+export const isEmptyCV = (cv: CV) =>
+  !cv.personal.fullName && !cv.summary && cv.experience.length === 0 && cv.projects.length === 0 && cv.skills.length === 0;

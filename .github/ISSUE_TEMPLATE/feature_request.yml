@@ -1,0 +1,16 @@
+name: 💡 নতুন ফিচারের আইডিয়া (Feature request)
+description: কোনো নতুন সুবিধা বা উন্নতির প্রস্তাব
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: কী চান?
+      placeholder: Laravel ডেভেলপারদের জন্য আলাদা একটা টেমপ্লেট...
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: কেন দরকার?
+      description: এটা কোন সমস্যার সমাধান করবে?
