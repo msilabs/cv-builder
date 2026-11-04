@@ -118,9 +118,10 @@ function classic(cv: CV, rs: ReadmeSettings) {
   if (cv.openToWork) o.push(`> 🟢 **Open to new opportunities** — feel free to reach out!\n`);
 
   const about: string[] = [];
-  const job = currentJob(cv);
+  // লুকানো সেকশনের তথ্য "About me"-তেও আসবে না
+  const job = show(rs, "experience") ? currentJob(cv) : undefined;
   if (job) about.push(`- 💼 Currently working as **${md(job.role)}**${job.company ? ` at **${md(job.company)}**` : ""}`);
-  const fp = pickProjects(cv, 1)[0];
+  const fp = show(rs, "projects") ? pickProjects(cv, 1)[0] : undefined;
   if (fp) about.push(`- 🚀 Recently built **${md(fp.name)}**${fp.tech ? ` with ${md(fp.tech)}` : ""}`);
   if (show(rs, "achievements") && cv.achievements[0]) about.push(`- 🏆 ${md(cv.achievements[0].text)}`);
   if (p.email) about.push(`- 📫 Reach me at **${md(p.email)}**`);
@@ -181,7 +182,7 @@ function code(cv: CV, rs: ReadmeSettings) {
   const p = cv.personal;
   const user = githubUsername(p.github);
   const varName = (firstName(p.fullName) || "me").toLowerCase().replace(/[^a-z0-9_]/g, "") || "me";
-  const job = currentJob(cv);
+  const job = show(rs, "experience") ? currentJob(cv) : undefined;
   const q = (s: string) => JSON.stringify(s);
   const body: string[] = [];
   if (p.title) body.push(`  role: ${q(p.title)},`);
