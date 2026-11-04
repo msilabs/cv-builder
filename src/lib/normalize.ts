@@ -137,3 +137,8 @@ export function parseImport(data: unknown): ImportResult {
   if (d.personal || d.experience || d.skills || d.projects || d.education) return { cv: normalizeCV(d) };
   throw new Error("no-cv");
 }
+
+// ফাইল থেকে সরাসরি ইমপোর্ট (JSON বা AI-এর উত্তর রাখা .txt)
+export async function readImportFile(f: File): Promise<ImportResult> {
+  return parseImport(extractJSON(await f.text()));
+}

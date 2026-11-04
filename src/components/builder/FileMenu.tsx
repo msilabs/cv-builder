@@ -33,7 +33,7 @@ export function FileMenu({ isEmpty, onImport }: { isEmpty: boolean; onImport: (r
 
   return (
     <>
-      <Menu label={<>📁 <span className="hidden sm:inline">{L.menu}</span></>} badge={warn}>
+      <Menu label={<>📁 <span className="hidden lg:inline">{L.menu}</span></>} badge={warn}>
         {(close) => (
           <>
             <MenuItem onClick={() => { exportProfile(profile); markBackup(); close(); }} hint={L.lastBackup(last)}>

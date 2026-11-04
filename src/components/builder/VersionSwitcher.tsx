@@ -1,6 +1,7 @@
 "use client";
 import { useLang } from "@/i18n/lang";
 import { Menu, MenuDivider, MenuItem } from "@/components/toolbar/Menu";
+import { btnOutline } from "@/components/ui/styles";
 import { useStore } from "@/lib/store";
 
 const ago = (time: number, A: { now: string; min: (x: number) => string; hour: (x: number) => string; day: (x: number) => string }) => {
@@ -24,7 +25,7 @@ export function VersionSwitcher() {
   const L = t.b.versions;
   return (
     <Menu align="left"
-      buttonClass="flex max-w-[11rem] items-center gap-1 rounded-md border border-slate-300 bg-white px-2.5 py-1.5 text-sm text-slate-700 hover:bg-slate-50 sm:max-w-[16rem]"
+      buttonClass={`${btnOutline} max-w-[8.5rem] !justify-start px-2.5 sm:max-w-[16rem]`}
       label={<><span aria-hidden>🗂</span><span className="truncate">{profile.name}</span></>}>
       {(close) => (
         <div className="w-72">

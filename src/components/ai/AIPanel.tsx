@@ -1,6 +1,6 @@
 "use client";
 import { useLang } from "@/i18n/lang";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { AI_LINKS, AI_TASKS, type AITask, buildPrompt, diffCV, mergeAI } from "@/lib/ai";
 import { copyText } from "@/lib/files";
@@ -19,7 +19,7 @@ const Step = ({ n, title, children }: { n: number; title: string; children: Reac
   </div>
 );
 
-export function AIPanel({ open, onClose, onApplied }: { open: boolean; onClose: () => void; onApplied: (prev: CV, profileId: string, message: string) => void }) {
+export function AIPanel({ open, onClose, onApplied, initialTask }: { open: boolean; onClose: () => void; onApplied: (prev: CV, profileId: string, message: string) => void; initialTask?: AITask | null }) {
   const { cv, profile, setCV, addProfile } = useStore();
   const { t } = useLang();
   const L = t.b.ai;
@@ -31,6 +31,14 @@ export function AIPanel({ open, onClose, onApplied }: { open: boolean; onClose: 
   const [newName, setNewName] = useState("");
 
   const meta = task ? AI_TASKS[task] : null;
+
+  // বাইরে থেকে নির্দিষ্ট কাজ দিয়ে খোলা (যেমন শুরুর পর্দার "পুরোনো CV থেকে")
+  useEffect(() => {
+    if (open && initialTask) {
+      setTask(initialTask);
+      setAsNew(AI_TASKS[initialTask].asNewVersion);
+    }
+  }, [open, initialTask]);
 
   const parsed = useMemo(() => {
     if (!task || !meta?.returnsJson || !answer.trim()) return null;

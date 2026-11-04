@@ -2,6 +2,7 @@
 const n = (x: number) => x.toLocaleString("bn-BD");
 
 export const builderBn = {
+  toolbar: { more: "আরও", language: "ভাষা", home: "হোম পেজ" },
   views: { cv: "CV", readme: "GitHub README", portfolio: "পোর্টফোলিও" },
   pane: { edit: "✏️ এডিট", preview: "👁 প্রিভিউ" },
   actions: {

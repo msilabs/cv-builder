@@ -6,10 +6,10 @@ const inputCls =
   "w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20";
 
 export function Field({
-  label, value, onChange, placeholder, type = "text", textarea, rows = 4, hint, disabled,
+  label, value, onChange, placeholder, type = "text", textarea, rows = 4, hint, disabled, id,
 }: {
   label: string; value: string; onChange: (v: string) => void; placeholder?: string;
-  type?: string; textarea?: boolean; rows?: number; hint?: string; disabled?: boolean;
+  type?: string; textarea?: boolean; rows?: number; hint?: string; disabled?: boolean; id?: string;
 }) {
   return (
     <label className="block">
@@ -17,7 +17,7 @@ export function Field({
       {textarea ? (
         <textarea className={inputCls} rows={rows} value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
       ) : (
-        <input className={`${inputCls} disabled:bg-slate-100 disabled:text-slate-400`} type={type} value={value} placeholder={placeholder} disabled={disabled} onChange={(e) => onChange(e.target.value)} />
+        <input id={id} className={`${inputCls} disabled:bg-slate-100 disabled:text-slate-400`} type={type} value={value} placeholder={placeholder} disabled={disabled} onChange={(e) => onChange(e.target.value)} />
       )}
       {hint && <span className="mt-1 block text-[11px] text-slate-400">{hint}</span>}
     </label>
@@ -41,7 +41,7 @@ export function Section({ title, icon, children, defaultOpen = false, count, vis
   const { t } = useLang();
   const hidden = visible === false;
   return (
-    <section className={`rounded-xl border bg-white shadow-sm ${hidden ? "border-dashed border-slate-300" : "border-slate-200"}`}>
+    <section className={`rounded-xl border bg-white shadow-sm transition ${hidden ? "border-dashed border-slate-300" : "border-slate-200 hover:border-slate-300"}`}>
       <div className="flex items-center gap-3 pr-4">
         <button type="button" onClick={() => setOpen(!open)} className="flex min-w-0 flex-1 items-center justify-between px-4 py-3 text-left">
           <span className={`flex items-center gap-2 font-semibold ${hidden ? "text-slate-400" : "text-slate-800"}`}>

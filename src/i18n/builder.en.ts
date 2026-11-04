@@ -3,6 +3,7 @@ import type { builderBn } from "./builder.bn";
 const plural = (c: number, one: string, many = `${one}s`) => `${c} ${c === 1 ? one : many}`;
 
 export const builderEn: typeof builderBn = {
+  toolbar: { more: "More", language: "Language", home: "Home page" },
   views: { cv: "CV", readme: "GitHub README", portfolio: "Portfolio" },
   pane: { edit: "✏️ Edit", preview: "👁 Preview" },
   actions: {

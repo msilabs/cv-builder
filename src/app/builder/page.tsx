@@ -1,5 +1,7 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { btnAI, btnOutline, btnPrimary } from "@/components/ui/styles";
+import type { AITask } from "@/lib/ai";
 import { templates } from "@/components/templates";
 import { AIPanel } from "@/components/ai/AIPanel";
 import { CVSettingsPanel } from "@/components/builder/CVSettingsPanel";
@@ -13,7 +15,7 @@ import Preview from "@/components/Preview";
 import { PortfolioHowTo, PortfolioPreviewPane, PortfolioSettingsPanel } from "@/components/portfolio/PortfolioPanels";
 import { ReadmeHowTo, ReadmePreviewPane, ReadmeSettingsPanel, useReadmeActions } from "@/components/readme/ReadmePanels";
 import { downloadText } from "@/lib/files";
-import type { ImportResult } from "@/lib/normalize";
+import { type ImportResult, readImportFile } from "@/lib/normalize";
 import { generatePortfolio } from "@/lib/portfolio";
 import { generateReadme, githubUsername } from "@/lib/readme";
 import { emptyCV, findSampleLeftovers, isEmptyCV, sampleCV, visibleCV } from "@/lib/sample";
@@ -31,6 +33,8 @@ export default function BuilderPage() {
   const { t } = useLang();
   const B = t.b;
   const [aiOpen, setAiOpen] = useState(false);
+  const [aiTask, setAiTask] = useState<AITask | null>(null);
+  const importRef = useRef<HTMLInputElement>(null);
   const [notice, setNotice] = useState<{ message: string; prev: CV; profileId: string } | null>(null);
   const [pane, setPane] = useState<"edit" | "preview">("edit");
   const [view, setView] = useState<View>("cv");
@@ -93,20 +97,39 @@ export default function BuilderPage() {
     setTimeout(() => (document.title = prev), 500);
   };
 
-  const primary = "rounded-md bg-teal-700 px-3 py-1.5 text-sm font-semibold text-white hover:bg-teal-800 sm:px-4";
+  const primary = btnPrimary;
+  const secondary = `${btnOutline} hidden sm:inline-flex`;
+  const openAI = (task: AITask | null = null) => {
+    setAiTask(task);
+    setAiOpen(true);
+  };
+  const importFile = async (f?: File) => {
+    if (!f) return;
+    try {
+      onImport(await readImportFile(f));
+    } catch (e) {
+      const m = (e as Error).message;
+      alert(B.file.openError(B.errors[m] ?? B.errors.parse));
+    }
+  };
+  const focusName = () => {
+    const el = document.getElementById("field-fullName");
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    el?.focus({ preventScroll: true });
+  };
   const actions =
     view === "readme" ? (
       <>
-        <button className="hidden rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 sm:block" onClick={readme.download}>{B.actions.md}</button>
+        <button className={secondary} onClick={readme.download}>{B.actions.md}</button>
         <button className={primary} onClick={readme.copy}>{readme.copied ? B.actions.copied : B.actions.copyReadme}</button>
       </>
     ) : view === "portfolio" ? (
       <>
-        <button className="hidden rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 sm:block" onClick={openPortfolio}>{B.actions.openTab}</button>
+        <button className={secondary} onClick={openPortfolio}>{B.actions.openTab}</button>
         <button className={primary} onClick={downloadPortfolio}>{B.actions.html}</button>
       </>
     ) : (
-      <button className={primary} onClick={downloadPDF}>⬇ {B.actions.pdf}<span className="hidden sm:inline">{B.actions.download}</span></button>
+      <button className={primary} onClick={downloadPDF}>⬇ {B.actions.pdf}<span className="hidden xl:inline">{B.actions.download}</span></button>
     );
 
   return (
@@ -117,27 +140,33 @@ export default function BuilderPage() {
           center={<ViewTabs view={view} setView={setView} available={AVAILABLE} />}
           right={
             <>
-              <button type="button" onClick={() => setAiOpen(true)} className="rounded-md border border-violet-300 bg-violet-50 px-3 py-1.5 text-sm font-medium text-violet-800 hover:bg-violet-100">
-                🤖 <span className="hidden sm:inline">{B.actions.ai}</span>
+              <button type="button" onClick={() => openAI()} aria-label={B.actions.ai} className={`${btnAI} w-9 px-0 lg:w-auto lg:px-3`}>
+                <span aria-hidden>🤖</span> <span className="hidden lg:inline">{B.actions.ai}</span>
               </button>
               <FileMenu isEmpty={isEmpty} onImport={onImport} />
               {actions}
             </>
           }
         />
-        <div className="flex border-t border-slate-100 lg:hidden">
+      </header>
+
+      {/* মোবাইল/ট্যাবলেটে নিচে ভাসমান এডিট/প্রিভিউ */}
+      <div className="fixed inset-x-0 bottom-4 z-30 flex justify-center lg:hidden print:hidden">
+        <div className="flex rounded-full border border-slate-200 bg-white/95 p-1 shadow-xl shadow-slate-900/15 backdrop-blur">
           {(["edit", "preview"] as const).map((k) => (
-            <button key={k} onClick={() => setPane(k)} className={`flex-1 py-2 text-sm font-medium ${pane === k ? "border-b-2 border-teal-700 text-teal-700" : "text-slate-500"}`}>
+            <button key={k} type="button" onClick={() => { setPane(k); window.scrollTo({ top: 0 }); }} aria-pressed={pane === k}
+              className={`rounded-full px-5 py-2 text-sm font-semibold transition ${pane === k ? "bg-teal-700 text-white" : "text-slate-600"}`}>
               {B.pane[k]}
             </button>
           ))}
         </div>
-      </header>
+      </div>
+      <input ref={importRef} type="file" accept="application/json,.json,.txt" className="hidden" onChange={(e) => { importFile(e.target.files?.[0]); e.target.value = ""; }} />
 
       <ImportDialog result={pendingImport} onClose={() => setPendingImport(null)} />
-      <AIPanel open={aiOpen} onClose={() => setAiOpen(false)} onApplied={(prev, profileId, message) => setNotice({ prev, profileId, message })} />
+      <AIPanel open={aiOpen} initialTask={aiTask} onClose={() => { setAiOpen(false); setAiTask(null); }} onApplied={(prev, profileId, message) => setNotice({ prev, profileId, message })} />
       <div className="grid flex-1 lg:min-h-0 lg:grid-cols-[minmax(380px,520px)_1fr] print:block">
-        <aside className={`space-y-3 overflow-y-auto p-4 lg:h-full print:hidden ${pane === "edit" ? "" : "hidden lg:block"}`}>
+        <aside className={`space-y-3 overflow-y-auto p-4 pb-24 lg:h-full lg:pb-4 print:hidden ${pane === "edit" ? "" : "hidden lg:block"}`}>
           {notice && (
             <div className="flex items-start justify-between gap-3 rounded-xl border border-violet-200 bg-violet-50 p-3 text-sm text-violet-900">
               <p>🤖 {notice.message} {B.notice.review}</p>
@@ -163,9 +192,22 @@ export default function BuilderPage() {
             </div>
           )}
           {loaded && isEmpty && (
-            <div className="rounded-xl border border-teal-200 bg-teal-50 p-3 text-sm text-teal-900">
-              <p>{B.welcome.body(B.views[view])}</p>
-              <button className="mt-2 text-xs font-semibold text-teal-700 underline" onClick={() => setCV(sampleCV)}>{B.welcome.sample}</button>
+            <div className="rounded-xl border border-teal-200 bg-gradient-to-br from-teal-50 to-white p-4 text-sm text-slate-700 shadow-sm">
+              <p className="font-semibold text-slate-900">{B.welcome.title}</p>
+              <p className="mt-1 text-slate-600">{B.welcome.body(B.views[view])}</p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {[
+                  { label: B.welcome.fill, onClick: focusName },
+                  { label: B.welcome.sample, onClick: () => setCV(sampleCV) },
+                  { label: B.welcome.ai, onClick: () => openAI("fromText") },
+                  { label: B.welcome.import, onClick: () => importRef.current?.click() },
+                ].map((x) => (
+                  <button key={x.label} type="button" onClick={x.onClick}
+                    className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:border-teal-400 hover:text-teal-800">
+                    {x.label}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
           {loaded && <Editor cv={cv} setCV={setCV} hidden={hidden} toggleSection={toggleSection} />}
@@ -174,7 +216,7 @@ export default function BuilderPage() {
           <p className="pb-6 text-center text-[11px] text-slate-400">{B.privacy}</p>
         </aside>
 
-        <main className={`overflow-y-auto p-4 lg:h-full print:block print:h-auto print:overflow-visible print:p-0 ${pane === "preview" ? "" : "hidden lg:block"}`}>
+        <main className={`overflow-y-auto bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] p-4 pb-24 [background-size:18px_18px] lg:h-full lg:pb-4 print:block print:bg-none print:h-auto print:overflow-visible print:p-0 ${pane === "preview" ? "" : "hidden lg:block"}`}>
           {loaded && view === "cv" && <Preview cv={shownCV} settings={settings} />}
           {loaded && view === "readme" && <ReadmePreviewPane markdown={markdown} />}
           {loaded && view === "portfolio" && <PortfolioPreviewPane html={portfolioHtml} />}

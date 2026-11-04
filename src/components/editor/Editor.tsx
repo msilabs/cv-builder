@@ -29,7 +29,7 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
     <div className="space-y-3">
       <Section title={L.personal} icon="👤" defaultOpen>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Field label={L.fullName} value={p.fullName} onChange={(v) => setP("fullName", v)} placeholder="Tanvir Ahmed" />
+          <Field id="field-fullName" label={L.fullName} value={p.fullName} onChange={(v) => setP("fullName", v)} placeholder="Tanvir Ahmed" />
           <Field label={L.title} value={p.title} onChange={(v) => setP("title", v)} placeholder="Flutter Developer" />
           <Field label={L.email} type="email" value={p.email} onChange={(v) => setP("email", v)} placeholder="you@example.com" />
           <Field label={L.phone} value={p.phone} onChange={(v) => setP("phone", v)} placeholder="+880 17XX-XXXXXX" />

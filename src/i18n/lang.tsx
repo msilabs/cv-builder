@@ -58,10 +58,10 @@ export const useLang = () => useContext(LangCtx);
 
 export function LangToggle({ lang, onChange, className = "" }: { lang: Lang; onChange: (l: Lang) => void; className?: string }) {
   return (
-    <div role="group" aria-label="Language" className={`flex shrink-0 rounded-md border border-slate-300 bg-white p-0.5 text-xs font-semibold dark:border-slate-700 dark:bg-slate-900 ${className}`}>
+    <div role="group" aria-label="Language" className={`flex h-9 shrink-0 items-center rounded-lg border border-slate-300 bg-white p-0.5 text-xs font-semibold dark:border-slate-700 dark:bg-slate-900 ${className}`}>
       {(["bn", "en"] as const).map((l) => (
         <button key={l} type="button" aria-pressed={lang === l} onClick={() => onChange(l)}
-          className={`rounded px-2 py-1 ${lang === l ? "bg-teal-700 text-white" : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"}`}>
+          className={`h-full rounded-md px-2 ${lang === l ? "bg-teal-700 text-white" : "text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"}`}>
           {l === "bn" ? "বাং" : "EN"}
         </button>
       ))}

@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { btnOutline } from "@/components/ui/styles";
 
-export function Menu({ label, children, align = "right", badge, buttonClass }: {
-  label: React.ReactNode; children: (close: () => void) => React.ReactNode; align?: "left" | "right"; badge?: boolean; buttonClass?: string;
+export function Menu({ label, children, align = "right", badge, buttonClass, ariaLabel, caret = true }: {
+  label: React.ReactNode; children: (close: () => void) => React.ReactNode; align?: "left" | "right"; badge?: boolean; buttonClass?: string; ariaLabel?: string; caret?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -19,13 +20,13 @@ export function Menu({ label, children, align = "right", badge, buttonClass }: {
   }, [open]);
   return (
     <div ref={ref} className="relative">
-      <button type="button" aria-expanded={open} onClick={() => setOpen(!open)}
-        className={buttonClass ?? "relative flex items-center gap-1 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"}>
-        {label} <span className="text-[10px] text-slate-400">▾</span>
+      <button type="button" aria-expanded={open} aria-haspopup="menu" aria-label={ariaLabel} onClick={() => setOpen(!open)}
+        className={`relative ${buttonClass ?? btnOutline}`}>
+        {label} {caret && <span className="text-[10px] text-slate-400" aria-hidden>▾</span>}
         {badge && <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-amber-500 ring-2 ring-white" />}
       </button>
       {open && (
-        <div className={`absolute z-40 mt-1 min-w-56 rounded-lg border border-slate-200 bg-white p-1 shadow-xl ${align === "right" ? "right-0" : "left-0"}`}>
+        <div role="menu" className={`absolute z-40 mt-1.5 min-w-56 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl shadow-slate-900/10 ${align === "right" ? "right-0" : "left-0"}`}>
           {children(() => setOpen(false))}
         </div>
       )}
