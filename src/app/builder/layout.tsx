@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LangProvider } from "@/i18n/lang";
 import { StoreProvider } from "@/lib/store";
 
 export const metadata: Metadata = {
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function BuilderLayout({ children }: { children: React.ReactNode }) {
-  return <StoreProvider>{children}</StoreProvider>;
+  return (
+    <LangProvider>
+      <StoreProvider>{children}</StoreProvider>
+    </LangProvider>
+  );
 }

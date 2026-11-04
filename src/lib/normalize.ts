@@ -106,14 +106,18 @@ export function extractJSON(text: string): unknown {
   if (fence) t = fence[1].trim();
   const a = t.indexOf("{");
   const b = t.lastIndexOf("}");
-  if (a < 0 || b <= a) throw new Error("কোনো JSON অবজেক্ট পাওয়া যায়নি");
+  if (a < 0 || b <= a) throw new Error("no-json");
   t = t.slice(a, b + 1);
   try {
     return JSON.parse(t);
   } catch {
     // AI-এর সাধারণ ভুল: শেষে বাড়তি কমা, স্মার্ট কোট
     const fixed = t.replace(/[“”]/g, '"').replace(/[‘’]/g, "'").replace(/,\s*([}\]])/g, "$1");
-    return JSON.parse(fixed);
+    try {
+      return JSON.parse(fixed);
+    } catch {
+      throw new Error("parse");
+    }
   }
 }
 
@@ -125,11 +129,11 @@ export interface ImportResult {
 
 // যেকোনো সমর্থিত আকারের ডেটা চিনে নেয়: v2 এক্সপোর্ট, v1 {cv, settings}, অথবা সরাসরি CV
 export function parseImport(data: unknown): ImportResult {
-  if (!data || typeof data !== "object") throw new Error("ডেটা খালি বা ভুল");
+  if (!data || typeof data !== "object") throw new Error("empty");
   const d = data as Any;
   if (d.cv && typeof d.cv === "object") {
     return { cv: normalizeCV(d.cv), settings: d.settings ? normalizeSettings(d.settings) : undefined, name: str(d.name) || undefined };
   }
   if (d.personal || d.experience || d.skills || d.projects || d.education) return { cv: normalizeCV(d) };
-  throw new Error("এতে CV-র কোনো তথ্য পাওয়া যায়নি");
+  throw new Error("no-cv");
 }

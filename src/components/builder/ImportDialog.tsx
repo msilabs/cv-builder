@@ -1,4 +1,5 @@
 "use client";
+import { useLang } from "@/i18n/lang";
 import { useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import type { ImportResult } from "@/lib/normalize";
@@ -9,8 +10,10 @@ import { useStore } from "@/lib/store";
 export function ImportDialog({ result, onClose }: { result: ImportResult | null; onClose: () => void }) {
   const { profile, setCV, setSettings, addProfile } = useStore();
   const [name, setName] = useState("");
+  const { t } = useLang();
+  const L = t.b.importDlg;
   if (!result) return null;
-  const defName = result.name || result.cv.personal.fullName || "ইমপোর্ট করা CV";
+  const defName = result.name || result.cv.personal.fullName || L.defaultName;
   const replace = () => {
     setCV(result.cv);
     if (result.settings) setSettings(result.settings);
@@ -22,23 +25,23 @@ export function ImportDialog({ result, onClose }: { result: ImportResult | null;
   };
   const c = result.cv;
   return (
-    <Modal open onClose={onClose} title="ইমপোর্ট করা CV কোথায় রাখবেন?">
+    <Modal open onClose={onClose} title={L.title}>
       <p className="text-sm text-slate-600">
-        পাওয়া গেছে: <b>{c.personal.fullName || "নাম নেই"}</b> · {c.experience.length}টা অভিজ্ঞতা · {c.projects.length}টা প্রজেক্ট · {c.skills.length}টা স্কিল গ্রুপ
+        {L.found(c.personal.fullName || L.noName, c.experience.length, c.projects.length, c.skills.length)}
       </p>
       <div className="mt-4 space-y-3">
         <div className="rounded-xl border border-teal-200 bg-teal-50/60 p-3">
-          <p className="text-sm font-semibold text-slate-800">নতুন ভার্সন হিসেবে রাখুন (নিরাপদ)</p>
-          <p className="text-xs text-slate-500">বর্তমান &quot;{profile.name}&quot; যেমন আছে তেমনই থাকবে।</p>
+          <p className="text-sm font-semibold text-slate-800">{L.asNew}</p>
+          <p className="text-xs text-slate-500">{L.asNewHint(profile.name)}</p>
           <div className="mt-2 flex gap-2">
             <input value={name} onChange={(e) => setName(e.target.value)} placeholder={defName}
               className="min-w-0 flex-1 rounded-md border border-slate-300 px-3 py-1.5 text-sm outline-none focus:border-teal-600" />
-            <button type="button" onClick={asNew} className="rounded-md bg-teal-700 px-3 py-1.5 text-sm font-semibold text-white hover:bg-teal-800">নতুন ভার্সন</button>
+            <button type="button" onClick={asNew} className="rounded-md bg-teal-700 px-3 py-1.5 text-sm font-semibold text-white hover:bg-teal-800">{L.asNewBtn}</button>
           </div>
         </div>
         <button type="button" onClick={replace} className="w-full rounded-xl border border-slate-200 p-3 text-left hover:bg-slate-50">
-          <p className="text-sm font-semibold text-slate-800">&quot;{profile.name}&quot; এর ডেটা বদলে দিন</p>
-          <p className="text-xs text-slate-500">{isEmptyCV(profile.cv) ? "এই ভার্সনটা এখন খালি।" : "⚠ এই ভার্সনের বর্তমান ডেটা মুছে যাবে।"}</p>
+          <p className="text-sm font-semibold text-slate-800">{L.replace(profile.name)}</p>
+          <p className="text-xs text-slate-500">{isEmptyCV(profile.cv) ? L.replaceEmpty : L.replaceWarn}</p>
         </button>
       </div>
     </Modal>

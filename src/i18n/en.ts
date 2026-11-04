@@ -1,4 +1,5 @@
 import type { Dict } from "./dict";
+import { builderEn } from "./builder.en";
 
 export const en: Dict = {
   meta: {
@@ -6,6 +7,7 @@ export const en: Dict = {
     description: "Built for web, mobile and software developers. Enter your details once and get an ATS-friendly CV (PDF), a GitHub profile README and a portfolio site. Free, no sign-up.",
   },
   brand: { a: "CV", b: "বানাও" },
+  b: builderEn,
   tpl: {
     classic: { name: "Classic", desc: "Single column, safest choice" },
     compact: { name: "Compact", desc: "Dense, fits more on one page" },

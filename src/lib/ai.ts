@@ -5,12 +5,13 @@ import { commaList, lines } from "./utils";
 
 export type AITask = "fromText" | "improve" | "tailor" | "summary" | "coverLetter";
 
-export const AI_TASKS: Record<AITask, { title: string; desc: string; icon: string; needs?: "oldCv" | "jd"; returnsJson: boolean; asNewVersion: boolean }> = {
-  fromText: { icon: "📥", title: "পুরোনো CV বা LinkedIn থেকে শুরু", desc: "পুরোনো CV-র লেখা দিন, AI সেটা এখানকার ফরম্যাটে সাজিয়ে দেবে", needs: "oldCv", returnsJson: true, asNewVersion: false },
-  improve: { icon: "✨", title: "CV-র লেখা উন্নত করুন", desc: "ভাষা আরও পরিষ্কার ও প্রফেশনাল, ATS-বান্ধব করবে", returnsJson: true, asNewVersion: false },
-  tailor: { icon: "🎯", title: "নির্দিষ্ট জবের জন্য সাজান", desc: "জব ডেসক্রিপশন দিন, সেই অনুযায়ী আলাদা CV ভার্সন হবে", needs: "jd", returnsJson: true, asNewVersion: true },
-  summary: { icon: "📝", title: "সামারি ও tagline লিখুন", desc: "শুধু সামারি আর এক লাইনের পরিচিতি নতুন করে লিখবে", returnsJson: true, asNewVersion: false },
-  coverLetter: { icon: "✉️", title: "কভার লেটার লিখুন", desc: "জব ডেসক্রিপশন অনুযায়ী কভার লেটার (সাধারণ লেখা, ইমপোর্ট লাগবে না)", needs: "jd", returnsJson: false, asNewVersion: false },
+// কাজের নাম ও বিবরণ অভিধানে (t.b.ai.tasks)
+export const AI_TASKS: Record<AITask, { icon: string; needs?: "oldCv" | "jd"; returnsJson: boolean; asNewVersion: boolean }> = {
+  fromText: { icon: "📥", needs: "oldCv", returnsJson: true, asNewVersion: false },
+  improve: { icon: "✨", returnsJson: true, asNewVersion: false },
+  tailor: { icon: "🎯", needs: "jd", returnsJson: true, asNewVersion: true },
+  summary: { icon: "📝", returnsJson: true, asNewVersion: false },
+  coverLetter: { icon: "✉️", needs: "jd", returnsJson: false, asNewVersion: false },
 };
 
 // AI-কে যা পাঠানো হবে: id, ছবি, ফোন, ইমেইল বাদ; লাইনগুলো অ্যারে করে (AI-এর জন্য সহজ)
@@ -144,7 +145,7 @@ ${data}
 
 // AI যে অংশ পাঠিয়েছে শুধু সেটুকু বদলায়; ফোন, ইমেইল, ছবি সবসময় আগের মতো
 export function mergeAI(current: CV, raw: unknown): CV {
-  if (!raw || typeof raw !== "object") throw new Error("উত্তরে JSON অবজেক্ট নেই");
+  if (!raw || typeof raw !== "object") throw new Error("no-json");
   const r = raw as Record<string, unknown>;
   const n = normalizeCV(r);
   const out: CV = { ...current };
@@ -166,13 +167,28 @@ export function mergeAI(current: CV, raw: unknown): CV {
     out.personal = personal;
     touched++;
   }
-  if (!touched) throw new Error("উত্তরে CV-র কোনো চেনা অংশ (summary, experience ইত্যাদি) পাওয়া যায়নি");
+  if (!touched) throw new Error("no-sections");
   return out;
 }
 
-const LABELS: Record<string, string> = {
-  fullName: "নাম", title: "পদবি", tagline: "tagline", location: "ঠিকানা", github: "GitHub", linkedin: "LinkedIn", website: "ওয়েবসাইট",
-};
+const PERSONAL_KEYS = ["fullName", "title", "tagline", "location", "github", "linkedin", "website"] as const;
+
+// পরিবর্তনের বার্তা কোন ভাষায় হবে, সেটা UI থেকে আসে (t.b.ai.diff)
+export interface DiffLabels {
+  personal: Record<string, string>;
+  fieldChanged: (label: string) => string;
+  summary: string;
+  openToWork: (on: boolean) => string;
+  skills: (c: number) => string;
+  count: (label: string, a: number, b: number) => string;
+  points: (label: string, name: string, c: number) => string;
+  experience: string;
+  projects: string;
+  education: string;
+  achievements: string;
+  certifications: string;
+  languages: string;
+}
 
 export interface AIDiff {
   changes: string[];
@@ -190,29 +206,29 @@ const numbers = (t: string) =>
       .filter((s) => !/^(19|20)\d{2}$/.test(s) && !/^\d$/.test(s)),
   );
 
-export function diffCV(a: CV, b: CV): AIDiff {
+export function diffCV(a: CV, b: CV, L: DiffLabels): AIDiff {
   const changes: string[] = [];
-  for (const k of Object.keys(LABELS) as (keyof CV["personal"])[]) if (a.personal[k] !== b.personal[k]) changes.push(`${LABELS[k]} বদলেছে`);
-  if (a.summary !== b.summary) changes.push("সামারি নতুন করে লেখা হয়েছে");
-  if (a.openToWork !== b.openToWork) changes.push(`Open to work: ${b.openToWork ? "চালু" : "বন্ধ"}`);
+  for (const k of PERSONAL_KEYS) if (a.personal[k] !== b.personal[k]) changes.push(L.fieldChanged(L.personal[k] ?? k));
+  if (a.summary !== b.summary) changes.push(L.summary);
+  if (a.openToWork !== b.openToWork) changes.push(L.openToWork(b.openToWork));
   const sk = (c: CV) => c.skills.map((s) => `${s.name}:${s.items}`).join("|");
-  if (sk(a) !== sk(b)) changes.push(`স্কিল সাজানো হয়েছে (${b.skills.length}টা গ্রুপ)`);
+  if (sk(a) !== sk(b)) changes.push(L.skills(b.skills.length));
   const listDiff = (label: string, x: { bullets: string }[], y: { bullets: string }[], names: (i: number) => string) => {
-    if (x.length !== y.length) changes.push(`${label}: ${x.length}টা থেকে ${y.length}টা`);
+    if (x.length !== y.length) changes.push(L.count(label, x.length, y.length));
     y.forEach((item, i) => {
       if (!x[i]) return;
       const before = lines(x[i].bullets), after = lines(item.bullets);
       const changed = after.filter((l) => !before.includes(l)).length;
-      if (changed) changes.push(`${label} "${names(i)}": ${changed}টা পয়েন্ট বদলেছে`);
+      if (changed) changes.push(L.points(label, names(i), changed));
     });
   };
-  listDiff("অভিজ্ঞতা", a.experience, b.experience, (i) => b.experience[i].role || b.experience[i].company);
-  listDiff("প্রজেক্ট", a.projects, b.projects, (i) => b.projects[i].name);
-  if (a.education.length !== b.education.length) changes.push(`শিক্ষা: ${a.education.length}টা থেকে ${b.education.length}টা`);
+  listDiff(L.experience, a.experience, b.experience, (i) => b.experience[i].role || b.experience[i].company);
+  listDiff(L.projects, a.projects, b.projects, (i) => b.projects[i].name);
+  if (a.education.length !== b.education.length) changes.push(L.count(L.education, a.education.length, b.education.length));
   const st = (l: { text: string }[]) => l.map((x) => x.text).join("|");
-  if (st(a.achievements) !== st(b.achievements)) changes.push("অর্জনের তালিকা বদলেছে");
-  if (st(a.certifications) !== st(b.certifications)) changes.push("সার্টিফিকেশন বদলেছে");
-  if (a.languages !== b.languages) changes.push("ভাষা বদলেছে");
+  if (st(a.achievements) !== st(b.achievements)) changes.push(L.achievements);
+  if (st(a.certifications) !== st(b.certifications)) changes.push(L.certifications);
+  if (a.languages !== b.languages) changes.push(L.languages);
   const old = numbers(textOf(a));
   const newNumbers = [...numbers(textOf(b))].filter((x) => !old.has(x));
   return { changes, newNumbers };

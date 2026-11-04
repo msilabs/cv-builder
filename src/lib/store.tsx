@@ -5,6 +5,10 @@ import type { CV, Settings } from "./types";
 import { defaultSettings, emptyCV } from "./sample";
 import { normalizeCV, normalizeSettings } from "./normalize";
 import { uid } from "./utils";
+import { detectLang } from "@/i18n/lang";
+import { dict } from "@/i18n/dict";
+
+const mainName = () => dict[detectLang()].b.versions.mainName;
 
 export const STORAGE_KEY = "cvbanao:data:v2";
 const LEGACY_KEY = "bd-cv-builder:v1";
@@ -37,7 +41,7 @@ const newProfile = (name: string, cv: CV = emptyCV, settings: Settings = default
 });
 
 function freshData(): AppData {
-  const p = newProfile("মূল CV");
+  const p = newProfile(mainName());
   return { app: "cvbanao", version: DATA_VERSION, activeId: p.id, profiles: [p], lastBackupAt: null };
 }
 
@@ -67,7 +71,7 @@ function loadData(): AppData {
     const old = localStorage.getItem(LEGACY_KEY);
     if (old) {
       const o = JSON.parse(old);
-      const p = newProfile("মূল CV", normalizeCV(o.cv), normalizeSettings(o.settings));
+      const p = newProfile(mainName(), normalizeCV(o.cv), normalizeSettings(o.settings));
       return { app: "cvbanao", version: DATA_VERSION, activeId: p.id, profiles: [p], lastBackupAt: null };
     }
   } catch {

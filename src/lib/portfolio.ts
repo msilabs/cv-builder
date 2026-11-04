@@ -120,16 +120,12 @@ footer{border-top:1px solid var(--line);padding:24px 0;color:var(--muted);font-s
 @media print{.nav{display:none}}
 `;
 
-const THEMES: Record<PortfolioTheme, { name: string; desc: string; css: string }> = {
+const THEMES: Record<PortfolioTheme, { css: string }> = {
   clean: {
-    name: "ক্লিন",
-    desc: "হালকা, ডার্ক মোডও নিজে থেকে",
     css: `:root{--bg:#ffffff;--fg:#0f172a;--muted:#64748b;--card:#ffffff;--chip:#f8fafc;--line:#e2e8f0}
 @media (prefers-color-scheme:dark){:root{--bg:#0b1120;--fg:#e2e8f0;--muted:#94a3b8;--card:#111827;--chip:#1e293b;--line:#1f2a3d}}`,
   },
   midnight: {
-    name: "মিডনাইট",
-    desc: "ডার্ক, ডেভেলপার ভাইব",
     css: `:root{--bg:#070b14;--fg:#e5e7eb;--muted:#8b95a7;--card:#0d1424;--chip:#111a2e;--line:#1b2538}
 body{background:radial-gradient(1200px 500px at 80% -10%,color-mix(in srgb,var(--accent) 22%,transparent),transparent),var(--bg)}
 h1{background:linear-gradient(90deg,var(--fg),color-mix(in srgb,var(--accent) 70%,var(--fg)));-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -137,8 +133,6 @@ h1{background:linear-gradient(90deg,var(--fg),color-mix(in srgb,var(--accent) 70
 .project:hover{border-color:color-mix(in srgb,var(--accent) 60%,var(--line))}`,
   },
   bento: {
-    name: "বেন্টো",
-    desc: "কার্ডের গ্রিড, আধুনিক",
     css: `:root{--bg:#f4f4f5;--fg:#18181b;--muted:#71717a;--card:#ffffff;--chip:#f4f4f5;--line:#e4e4e7}
 main.wrap{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;padding-top:24px;padding-bottom:24px}
 main.wrap>section{grid-column:span 6;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:28px}
@@ -150,10 +144,7 @@ main.wrap>.pair-wide{grid-column:span 4}main.wrap>.pair-narrow{grid-column:span 
   },
 };
 
-export const PORTFOLIO_THEMES = Object.fromEntries(Object.entries(THEMES).map(([k, v]) => [k, { name: v.name, desc: v.desc }])) as Record<
-  PortfolioTheme,
-  { name: string; desc: string }
->;
+export const PORTFOLIO_THEME_IDS = Object.keys(THEMES) as PortfolioTheme[];
 
 export function generatePortfolio(cv: CV, ps: PortfolioSettings): string {
   const p = cv.personal;

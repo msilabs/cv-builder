@@ -49,7 +49,7 @@ export function HomePage({ lang }: { lang: Lang }) {
           </nav>
           <div className="flex items-center gap-2">
             <HomeLangSwitch lang={lang} />
-            <span className="hidden sm:block"><StarButton compact /></span>
+            <span className="hidden sm:block"><StarButton compact title={t.b.github.starTitle} /></span>
             <Link href="/builder" className="rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800">{h.nav.start}</Link>
           </div>
         </div>

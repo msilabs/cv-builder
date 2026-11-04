@@ -234,12 +234,7 @@ function minimal(cv: CV, rs: ReadmeSettings) {
   return o;
 }
 
-export const README_STYLES: Record<ReadmeSettings["style"], { name: string; desc: string }> = {
-  classic: { name: "ক্লাসিক", desc: "ইমোজি হেডিং, টেক ব্যাজ" },
-  centered: { name: "সেন্টার্ড", desc: "মাঝখানে হেডার, স্কিল আইকন" },
-  code: { name: "কোড", desc: "পরিচিতি কোডের মতো করে" },
-  minimal: { name: "মিনিমাল", desc: "শুধু লেখা, কোনো ছবি নেই" },
-};
+export const README_STYLE_IDS: ReadmeSettings["style"][] = ["classic", "centered", "code", "minimal"];
 
 export function generateReadme(cv: CV, rs: ReadmeSettings): string {
   const fn = { classic, centered, code, minimal }[rs.style] ?? classic;

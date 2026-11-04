@@ -1,3 +1,4 @@
+import { builderBn } from "./builder.bn";
 // বাংলা লেখা (মূল উৎস; en.ts-কে এই আকার মানতে হয়)
 export const bn = {
   meta: {
@@ -5,6 +6,7 @@ export const bn = {
     description: "বাংলাদেশি ওয়েব, মোবাইল ও সফটওয়্যার ডেভেলপারদের জন্য। একবার তথ্য দিয়ে ATS-বান্ধব CV (PDF), GitHub প্রোফাইল README আর পোর্টফোলিও সাইট বানান। ফ্রি, লগইন ছাড়াই।",
   },
   brand: { a: "CV", b: "বানাও" },
+  b: builderBn,
   tpl: {
     classic: { name: "ক্লাসিক", desc: "এক কলাম, সবচেয়ে নিরাপদ" },
     compact: { name: "কম্প্যাক্ট", desc: "ঘন, এক পৃষ্ঠায় বেশি তথ্য" },

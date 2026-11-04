@@ -121,9 +121,11 @@ export const sampleCV: CV = {
 };
 
 // CV-তে নমুনার কোন লেখা এখনো রয়ে গেছে তা খুঁজে বের করে (ভুলে রেখে দেওয়া আটকাতে)
-export function findSampleLeftovers(cv: CV): string[] {
+export type LeftoverKey = "fullName" | "email" | "phone" | "github" | "linkedin" | "website" | "summary" | "experience" | "projects" | "education" | "achievements" | "certifications";
+
+export function findSampleLeftovers(cv: CV): LeftoverKey[] {
   const s = sampleCV;
-  const found = new Set<string>();
+  const found = new Set<LeftoverKey>();
   const norm = (t: string) => t.trim().toLowerCase();
   const has = (values: string[], target: string) => {
     const n = norm(target);
@@ -132,23 +134,21 @@ export function findSampleLeftovers(cv: CV): string[] {
   const sampleLines = (arr: { bullets: string }[]) => arr.flatMap((x) => x.bullets.split("\n"));
 
   const p = s.personal;
-  const personalLabels: [keyof typeof p, string][] = [
-    ["fullName", "নাম"], ["email", "ইমেইল"], ["phone", "মোবাইল"], ["github", "GitHub"], ["linkedin", "LinkedIn"], ["website", "ওয়েবসাইট"],
-  ];
-  for (const [k, label] of personalLabels) if (has([p[k]], cv.personal[k])) found.add(label);
-  if (has([s.summary], cv.summary)) found.add("সামারি");
+  const personalKeys = ["fullName", "email", "phone", "github", "linkedin", "website"] as const;
+  for (const k of personalKeys) if (has([p[k]], cv.personal[k])) found.add(k);
+  if (has([s.summary], cv.summary)) found.add("summary");
 
   for (const e of cv.experience) {
-    if (has(s.experience.map((x) => x.company), e.company)) found.add("অভিজ্ঞতা");
-    if (e.bullets.split("\n").some((l) => has(sampleLines(s.experience), l))) found.add("অভিজ্ঞতা");
+    if (has(s.experience.map((x) => x.company), e.company)) found.add("experience");
+    if (e.bullets.split("\n").some((l) => has(sampleLines(s.experience), l))) found.add("experience");
   }
   for (const pr of cv.projects) {
-    if (has(s.projects.map((x) => x.name), pr.name) || has(s.projects.flatMap((x) => [x.link, x.repo]), pr.link) || has(s.projects.flatMap((x) => [x.link, x.repo]), pr.repo)) found.add("প্রজেক্ট");
-    if (pr.bullets.split("\n").some((l) => has(sampleLines(s.projects), l))) found.add("প্রজেক্ট");
+    if (has(s.projects.map((x) => x.name), pr.name) || has(s.projects.flatMap((x) => [x.link, x.repo]), pr.link) || has(s.projects.flatMap((x) => [x.link, x.repo]), pr.repo)) found.add("projects");
+    if (pr.bullets.split("\n").some((l) => has(sampleLines(s.projects), l))) found.add("projects");
   }
-  for (const ed of cv.education) if (has(s.education.map((x) => x.institution), ed.institution)) found.add("শিক্ষা");
-  for (const a of cv.achievements) if (has(s.achievements.map((x) => x.text), a.text)) found.add("অর্জন");
-  for (const c of cv.certifications) if (has(s.certifications.map((x) => x.text), c.text)) found.add("সার্টিফিকেশন");
+  for (const ed of cv.education) if (has(s.education.map((x) => x.institution), ed.institution)) found.add("education");
+  for (const a of cv.achievements) if (has(s.achievements.map((x) => x.text), a.text)) found.add("achievements");
+  for (const c of cv.certifications) if (has(s.certifications.map((x) => x.text), c.text)) found.add("certifications");
   return [...found];
 }
 

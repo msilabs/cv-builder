@@ -1,4 +1,5 @@
 "use client";
+import { useLang } from "@/i18n/lang";
 import { useEffect, useState } from "react";
 import { ISSUES_URL, REPO, REPO_URL } from "@/lib/site";
 
@@ -31,10 +32,11 @@ function useStars() {
   return stars;
 }
 
-export function StarButton({ compact = false }: { compact?: boolean }) {
+export function StarButton({ compact = false, title }: { compact?: boolean; title?: string }) {
   const stars = useStars();
+  const { t } = useLang();
   return (
-    <a href={REPO_URL} target="_blank" rel="noreferrer" title="GitHub-এ ⭐ দিয়ে সাপোর্ট করুন"
+    <a href={REPO_URL} target="_blank" rel="noreferrer" title={title ?? t.b.github.starTitle}
       className="flex shrink-0 items-center overflow-hidden rounded-md border border-slate-300 bg-white text-sm text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">
       <span className="flex items-center gap-1.5 px-2.5 py-1.5">
         <GitHubIcon />
@@ -46,10 +48,11 @@ export function StarButton({ compact = false }: { compact?: boolean }) {
 }
 
 export function IssueLink({ className = "" }: { className?: string }) {
+  const { t } = useLang();
   return (
-    <a href={ISSUES_URL} target="_blank" rel="noreferrer" title="সমস্যা বা নতুন আইডিয়া জানান"
+    <a href={ISSUES_URL} target="_blank" rel="noreferrer" title={t.b.github.issueTitle} aria-label={t.b.github.issue}
       className={`flex items-center gap-1 rounded-md px-2 py-1.5 text-sm text-slate-600 hover:bg-slate-100 ${className}`}>
-      🐞 <span className="hidden xl:inline">সমস্যা জানান</span>
+      🐞 <span className="hidden 2xl:inline">{t.b.github.issue}</span>
     </a>
   );
 }
