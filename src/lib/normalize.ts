@@ -45,6 +45,8 @@ export function normalizeCV(raw: unknown): CV {
   const p = (r.personal && typeof r.personal === "object" ? r.personal : {}) as Any;
   const personal = { ...emptyCV.personal };
   for (const k of Object.keys(personal) as (keyof CV["personal"])[]) personal[k] = str(p[k]);
+  // ছবি শুধু data:image (আপলোড করা ছবি); বাইরের লিংক হলে বাদ, যাতে ফাইল দিয়ে ট্র্যাকিং ছবি ঢোকানো না যায়
+  if (!/^data:image\/(png|jpe?g|webp|gif);base64,/.test(personal.photo)) personal.photo = "";
 
   return {
     ...emptyCV,

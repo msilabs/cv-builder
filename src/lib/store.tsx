@@ -120,7 +120,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!loaded) return;
     if (skipSave.current) {
+      // অন্য ট্যাব থেকে আসা ডেটা: এই ট্যাবের পুরোনো, অপেক্ষমাণ সেভ বাতিল, নইলে সেটা নতুন ডেটার ওপর লিখে ফেলত
       skipSave.current = false;
+      if (timer.current) clearTimeout(timer.current);
       return;
     }
     setSaveState("saving");
