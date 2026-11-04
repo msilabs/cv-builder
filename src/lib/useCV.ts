@@ -1,12 +1,12 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { CV, Settings } from "./types";
-import { defaultSettings, emptyCV, sampleCV } from "./sample";
+import { defaultSettings, emptyCV } from "./sample";
 
 const KEY = "bd-cv-builder:v1";
 
 export function useCV() {
-  const [cv, setCV] = useState<CV>(sampleCV);
+  const [cv, setCV] = useState<CV>(emptyCV);
   const [settings, setSettings] = useState<Settings>(defaultSettings);
   const [loaded, setLoaded] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);

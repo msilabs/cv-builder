@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import Editor from "@/components/editor/Editor";
 import Preview from "@/components/Preview";
 import { templates } from "@/components/templates";
-import { emptyCV, sampleCV } from "@/lib/sample";
+import { emptyCV, findSampleLeftovers, sampleCV } from "@/lib/sample";
 import type { TemplateId } from "@/lib/types";
 import { useCV } from "@/lib/useCV";
 
@@ -15,7 +15,11 @@ export default function BuilderPage() {
   const [tab, setTab] = useState<"edit" | "preview">("edit");
   const fileRef = useRef<HTMLInputElement>(null);
 
+  const leftovers = findSampleLeftovers(cv);
+  const isEmpty = !cv.personal.fullName && !cv.summary && cv.experience.length === 0 && cv.projects.length === 0 && cv.skills.length === 0;
+
   const downloadPDF = () => {
+    if (leftovers.length && !confirm(`সতর্কতা: আপনার CV-তে এখনো নমুনা ডেটা আছে (${leftovers.join(", ")})।\n\nতবুও PDF ডাউনলোড করবেন?`)) return;
     const prev = document.title;
     document.title = `${cv.personal.fullName || "CV"} - CV`.replace(/[\\/:*?"<>|]/g, "");
     window.print();
@@ -53,7 +57,7 @@ export default function BuilderPage() {
         <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5">
           <Link href="/" className="font-bold text-teal-700">CV<span className="text-slate-800">বানাও</span></Link>
           <div className="flex flex-wrap items-center gap-2">
-            <button className={btn} onClick={() => confirm("নমুনা ডেটা লোড করবেন? বর্তমান ডেটা মুছে যাবে।") && setCV(sampleCV)}>নমুনা</button>
+            <button className={btn} onClick={() => (isEmpty || confirm("নমুনা ডেটা লোড করবেন? বর্তমান ডেটা মুছে যাবে।")) && setCV(sampleCV)}>নমুনা</button>
             <button className={btn} onClick={() => confirm("সব ডেটা মুছে ফেলবেন?") && setCV(emptyCV)}>নতুন করে শুরু</button>
             <button className={btn} onClick={exportJSON} title="ব্যাকআপ হিসেবে সেভ করুন">JSON সেভ</button>
             <button className={btn} onClick={() => fileRef.current?.click()}>JSON ইমপোর্ট</button>
@@ -97,6 +101,21 @@ export default function BuilderPage() {
               )}
             </div>
           </div>
+          {loaded && leftovers.length > 0 && (
+            <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
+              <p className="font-semibold">⚠️ নমুনা ডেটা এখনো রয়ে গেছে</p>
+              <p className="mt-1">এই ঘরগুলোতে নিজের তথ্য দিন: <b>{leftovers.join(", ")}</b></p>
+              <button className="mt-2 rounded-md bg-amber-600 px-3 py-1 text-xs font-semibold text-white hover:bg-amber-700" onClick={() => confirm("সব মুছে খালি ফর্ম দিয়ে শুরু করবেন?") && setCV(emptyCV)}>
+                সব মুছে নতুন করে শুরু
+              </button>
+            </div>
+          )}
+          {loaded && isEmpty && (
+            <div className="rounded-xl border border-teal-200 bg-teal-50 p-3 text-sm text-teal-900">
+              <p>👋 নিচের ফর্ম পূরণ করুন, ডান পাশে CV তৈরি হতে দেখবেন।</p>
+              <button className="mt-2 text-xs font-semibold text-teal-700 underline" onClick={() => setCV(sampleCV)}>একটা নমুনা CV দেখতে চাই</button>
+            </div>
+          )}
           {loaded && <Editor cv={cv} setCV={(fn) => setCV(fn)} />}
           <p className="pb-6 text-center text-[11px] text-slate-400">🔒 আপনার ডেটা শুধু আপনার ব্রাউজারেই সেভ থাকে, কোনো সার্ভারে যায় না।</p>
         </aside>

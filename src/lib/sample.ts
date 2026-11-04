@@ -103,3 +103,35 @@ export const sampleCV: CV = {
   certifications: [{ id: "c1", text: "AWS Certified Cloud Practitioner (2024)" }],
   languages: "Bangla (Native), English (Professional)",
 };
+
+// CV-তে নমুনার কোন লেখা এখনো রয়ে গেছে তা খুঁজে বের করে (ভুলে রেখে দেওয়া আটকাতে)
+export function findSampleLeftovers(cv: CV): string[] {
+  const s = sampleCV;
+  const found = new Set<string>();
+  const norm = (t: string) => t.trim().toLowerCase();
+  const has = (values: string[], target: string) => {
+    const n = norm(target);
+    return n.length > 2 && values.some((v) => norm(v) === n);
+  };
+  const sampleLines = (arr: { bullets: string }[]) => arr.flatMap((x) => x.bullets.split("\n"));
+
+  const p = s.personal;
+  const personalLabels: [keyof typeof p, string][] = [
+    ["fullName", "নাম"], ["email", "ইমেইল"], ["phone", "মোবাইল"], ["github", "GitHub"], ["linkedin", "LinkedIn"], ["website", "ওয়েবসাইট"],
+  ];
+  for (const [k, label] of personalLabels) if (has([p[k]], cv.personal[k])) found.add(label);
+  if (has([s.summary], cv.summary)) found.add("সামারি");
+
+  for (const e of cv.experience) {
+    if (has(s.experience.map((x) => x.company), e.company)) found.add("অভিজ্ঞতা");
+    if (e.bullets.split("\n").some((l) => has(sampleLines(s.experience), l))) found.add("অভিজ্ঞতা");
+  }
+  for (const pr of cv.projects) {
+    if (has(s.projects.map((x) => x.name), pr.name) || has(s.projects.flatMap((x) => [x.link, x.repo]), pr.link) || has(s.projects.flatMap((x) => [x.link, x.repo]), pr.repo)) found.add("প্রজেক্ট");
+    if (pr.bullets.split("\n").some((l) => has(sampleLines(s.projects), l))) found.add("প্রজেক্ট");
+  }
+  for (const ed of cv.education) if (has(s.education.map((x) => x.institution), ed.institution)) found.add("শিক্ষা");
+  for (const a of cv.achievements) if (has(s.achievements.map((x) => x.text), a.text)) found.add("অর্জন");
+  for (const c of cv.certifications) if (has(s.certifications.map((x) => x.text), c.text)) found.add("সার্টিফিকেশন");
+  return [...found];
+}
