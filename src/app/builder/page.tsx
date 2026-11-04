@@ -1,5 +1,6 @@
 "use client";
 import { useMemo, useState } from "react";
+import { AIPanel } from "@/components/ai/AIPanel";
 import { CVSettingsPanel } from "@/components/builder/CVSettingsPanel";
 import { FileMenu } from "@/components/builder/FileMenu";
 import { ImportDialog } from "@/components/builder/ImportDialog";
@@ -16,7 +17,7 @@ import { generatePortfolio } from "@/lib/portfolio";
 import { generateReadme, githubUsername } from "@/lib/readme";
 import { emptyCV, findSampleLeftovers, isEmptyCV, sampleCV, visibleCV } from "@/lib/sample";
 import { useStore } from "@/lib/store";
-import type { SectionKey, Settings } from "@/lib/types";
+import type { CV, SectionKey, Settings } from "@/lib/types";
 
 const AVAILABLE: View[] = ["cv", "readme", "portfolio"];
 
@@ -24,7 +25,9 @@ const AVAILABLE: View[] = ["cv", "readme", "portfolio"];
 const hiddenOf = (s: Settings, v: View) => (v === "readme" ? s.readme.hidden : v === "portfolio" ? s.portfolio.hidden : s.hidden);
 
 export default function BuilderPage() {
-  const { cv, setCV, settings, setSettings, loaded } = useStore();
+  const { cv, setCV, settings, setSettings, loaded, profile } = useStore();
+  const [aiOpen, setAiOpen] = useState(false);
+  const [notice, setNotice] = useState<{ message: string; prev: CV; profileId: string } | null>(null);
   const [pane, setPane] = useState<"edit" | "preview">("edit");
   const [view, setView] = useState<View>("cv");
   const [pendingImport, setPendingImport] = useState<ImportResult | null>(null);
@@ -95,7 +98,15 @@ export default function BuilderPage() {
         <Toolbar
           left={loaded && <VersionSwitcher />}
           center={<ViewTabs view={view} setView={setView} available={AVAILABLE} />}
-          right={<><FileMenu isEmpty={isEmpty} onImport={onImport} />{actions}</>}
+          right={
+            <>
+              <button type="button" onClick={() => setAiOpen(true)} className="rounded-md border border-violet-300 bg-violet-50 px-3 py-1.5 text-sm font-medium text-violet-800 hover:bg-violet-100">
+                🤖 <span className="hidden sm:inline">AI সহায়তা</span>
+              </button>
+              <FileMenu isEmpty={isEmpty} onImport={onImport} />
+              {actions}
+            </>
+          }
         />
         <div className="flex border-t border-slate-100 lg:hidden">
           {(["edit", "preview"] as const).map((k) => (
@@ -107,8 +118,21 @@ export default function BuilderPage() {
       </header>
 
       <ImportDialog result={pendingImport} onClose={() => setPendingImport(null)} />
+      <AIPanel open={aiOpen} onClose={() => setAiOpen(false)} onApplied={(prev, profileId, message) => setNotice({ prev, profileId, message })} />
       <div className="grid flex-1 lg:min-h-0 lg:grid-cols-[minmax(380px,520px)_1fr] print:block">
         <aside className={`space-y-3 overflow-y-auto p-4 lg:h-full print:hidden ${pane === "edit" ? "" : "hidden lg:block"}`}>
+          {notice && (
+            <div className="flex items-start justify-between gap-3 rounded-xl border border-violet-200 bg-violet-50 p-3 text-sm text-violet-900">
+              <p>🤖 {notice.message} নিচে দেখে নিন।</p>
+              <div className="flex shrink-0 gap-2">
+                {notice.profileId && notice.profileId === profile.id && (
+                  <button type="button" className="rounded-md bg-white px-2 py-1 text-xs font-semibold text-violet-800 ring-1 ring-violet-300 hover:bg-violet-100"
+                    onClick={() => { setCV(notice.prev); setNotice(null); }}>↩ আগের অবস্থায় ফিরুন</button>
+                )}
+                <button type="button" aria-label="বন্ধ করুন" className="px-1 text-violet-400 hover:text-violet-700" onClick={() => setNotice(null)}>✕</button>
+              </div>
+            </div>
+          )}
           {view === "cv" && <CVSettingsPanel />}
           {view === "readme" && <ReadmeSettingsPanel />}
           {view === "portfolio" && <PortfolioSettingsPanel />}
