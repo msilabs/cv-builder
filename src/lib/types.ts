@@ -71,7 +71,7 @@ export interface CV {
 
 export type SectionKey = "summary" | "skills" | "experience" | "projects" | "education" | "achievements" | "certifications" | "languages";
 
-export type TemplateId = "classic" | "modern" | "minimal";
+export type TemplateId = "classic" | "modern" | "minimal" | "compact" | "timeline" | "elegant";
 
 export type ReadmeStyle = "classic" | "centered" | "code" | "minimal";
 export type PortfolioTheme = "clean" | "midnight" | "bento";

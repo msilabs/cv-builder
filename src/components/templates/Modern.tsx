@@ -18,7 +18,7 @@ export default function Modern({ cv, settings }: TemplateProps) {
 
   return (
     <div className="grid min-h-[inherit] grid-cols-[34%_1fr] text-[9.3pt] leading-[1.42] text-neutral-800">
-      <aside className="px-[7mm] py-[12mm] text-white" style={{ background: accent }}>
+      <div className="px-[7mm] py-[12mm] text-white" style={{ background: accent }}>
         {showPhoto && p.photo && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={p.photo} alt="" className="mx-auto mb-5 h-28 w-28 rounded-full border-4 border-white/30 object-cover" />
@@ -58,9 +58,9 @@ export default function Modern({ cv, settings }: TemplateProps) {
             <p className="text-[8.6pt] text-white/90">{cv.languages}</p>
           </>
         )}
-      </aside>
+      </div>
 
-      <main className="px-[8mm] py-[12mm]">
+      <div className="px-[8mm] py-[12mm]">
         <h1 className="text-[22pt] font-extrabold leading-tight text-neutral-900">{p.fullName || "Your Name"}</h1>
         {p.title && <p className="text-[11.5pt] font-medium" style={{ color: accent }}>{p.title}</p>}
         {cv.summary && <p className="mt-3 text-neutral-700">{cv.summary}</p>}
@@ -134,7 +134,7 @@ export default function Modern({ cv, settings }: TemplateProps) {
             <Bullets text={[...cv.achievements, ...cv.certifications].map((a) => a.text).join("\n")} />
           </>
         )}
-      </main>
+      </div>
     </div>
   );
 }
