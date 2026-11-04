@@ -58,7 +58,7 @@ export default function Preview({ cv, settings, empty = false }: TemplateProps &
           <button type="button" className={zbtn} onClick={() => step(1)} disabled={scale >= ZOOMS[ZOOMS.length - 1]} aria-label={Z.in} title={Z.in}>+</button>
         </div>
       </div>
-      <div className="overflow-x-auto pb-2 print:overflow-visible">
+      <div className="overflow-x-auto pb-2 print:overflow-visible print:p-0">
         <div className="relative mx-auto print:!h-auto print:!w-auto" style={{ width: A4_PX * scale, height: height * scale }}>
           <div
             id="cv-page"
