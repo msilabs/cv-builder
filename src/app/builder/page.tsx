@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { CVSettingsPanel } from "@/components/builder/CVSettingsPanel";
 import { FileMenu } from "@/components/builder/FileMenu";
+import { ImportDialog } from "@/components/builder/ImportDialog";
+import { VersionSwitcher } from "@/components/builder/VersionSwitcher";
 import { Toolbar } from "@/components/builder/Toolbar";
 import Editor from "@/components/editor/Editor";
 import Preview from "@/components/Preview";
@@ -13,6 +15,7 @@ import type { SectionKey } from "@/lib/types";
 export default function BuilderPage() {
   const { cv, setCV, settings, setSettings, loaded } = useStore();
   const [pane, setPane] = useState<"edit" | "preview">("edit");
+  const [pendingImport, setPendingImport] = useState<ImportResult | null>(null);
 
   const shownCV = visibleCV(cv, settings.hidden);
   const leftovers = findSampleLeftovers(shownCV);
@@ -21,9 +24,11 @@ export default function BuilderPage() {
     setSettings((s) => ({ ...s, hidden: s.hidden.includes(k) ? s.hidden.filter((x) => x !== k) : [...s.hidden, k] }));
 
   const onImport = (r: ImportResult) => {
-    if (!isEmpty && !confirm("ইমপোর্ট করা ডেটা দিয়ে এই ভার্সনের বর্তমান ডেটা বদলে যাবে। চালিয়ে যাবেন?")) return;
-    setCV(r.cv);
-    if (r.settings) setSettings(r.settings);
+    // খালি ভার্সনে সরাসরি বসানো, নইলে কোথায় রাখবে জিজ্ঞেস
+    if (isEmpty) {
+      setCV(r.cv);
+      if (r.settings) setSettings(r.settings);
+    } else setPendingImport(r);
   };
 
   const downloadPDF = () => {
@@ -38,6 +43,7 @@ export default function BuilderPage() {
     <div className="flex min-h-screen flex-col bg-slate-100 print:block print:bg-white">
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur print:hidden">
         <Toolbar
+          left={loaded && <VersionSwitcher />}
           right={
             <>
               <FileMenu isEmpty={isEmpty} onImport={onImport} />
@@ -56,6 +62,7 @@ export default function BuilderPage() {
         </div>
       </header>
 
+      <ImportDialog result={pendingImport} onClose={() => setPendingImport(null)} />
       <div className="grid flex-1 lg:grid-cols-[minmax(380px,520px)_1fr] print:block">
         <aside className={`space-y-3 overflow-y-auto p-4 lg:h-[calc(100vh-49px)] print:hidden ${pane === "edit" ? "" : "hidden lg:block"}`}>
           <CVSettingsPanel />
