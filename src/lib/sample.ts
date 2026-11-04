@@ -19,7 +19,7 @@ export const defaultSettings: Settings = {
   showPhoto: false,
   hidden: [],
   readme: { style: "classic", showStats: false, hidden: ["education", "languages"] },
-  portfolio: { theme: "clean", showEmail: true, showPhone: false, showLocation: true, showPhoto: true, hidden: [] },
+  portfolio: { theme: "clean", accent: "#0f766e", showEmail: true, showPhone: false, showLocation: true, showPhoto: true, hidden: [] },
 };
 
 export const sampleCV: CV = {

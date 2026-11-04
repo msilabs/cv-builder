@@ -8,14 +8,17 @@ import { VersionSwitcher } from "@/components/builder/VersionSwitcher";
 import { useHashView, type View, ViewTabs } from "@/components/builder/ViewTabs";
 import Editor from "@/components/editor/Editor";
 import Preview from "@/components/Preview";
+import { PortfolioHowTo, PortfolioPreviewPane, PortfolioSettingsPanel } from "@/components/portfolio/PortfolioPanels";
 import { ReadmeHowTo, ReadmePreviewPane, ReadmeSettingsPanel, useReadmeActions } from "@/components/readme/ReadmePanels";
+import { downloadText } from "@/lib/files";
 import type { ImportResult } from "@/lib/normalize";
+import { generatePortfolio } from "@/lib/portfolio";
 import { generateReadme, githubUsername } from "@/lib/readme";
 import { emptyCV, findSampleLeftovers, isEmptyCV, sampleCV, visibleCV } from "@/lib/sample";
 import { useStore } from "@/lib/store";
 import type { SectionKey, Settings } from "@/lib/types";
 
-const AVAILABLE: View[] = ["cv", "readme"];
+const AVAILABLE: View[] = ["cv", "readme", "portfolio"];
 
 // কোন ট্যাবের "দেখাও/লুকাও" তালিকা
 const hiddenOf = (s: Settings, v: View) => (v === "readme" ? s.readme.hidden : v === "portfolio" ? s.portfolio.hidden : s.hidden);
@@ -52,6 +55,14 @@ export default function BuilderPage() {
   const okToExport = (what: string) =>
     !leftovers.length || confirm(`সতর্কতা: আপনার ${what}-তে এখনো নমুনা ডেটা আছে (${leftovers.join(", ")})।\n\nতবুও চালিয়ে যাবেন?`);
 
+  const portfolioHtml = useMemo(() => (view === "portfolio" ? generatePortfolio(shownCV, settings.portfolio) : ""), [view, shownCV, settings.portfolio]);
+  const downloadPortfolio = () => okToExport("পোর্টফোলিও") && downloadText("index.html", portfolioHtml, "text/html");
+  const openPortfolio = () => {
+    const url = URL.createObjectURL(new Blob([portfolioHtml], { type: "text/html" }));
+    window.open(url, "_blank", "noopener");
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  };
+
   const readme = useReadmeActions(markdown, () => okToExport("README"));
 
   const downloadPDF = () => {
@@ -68,6 +79,11 @@ export default function BuilderPage() {
       <>
         <button className="hidden rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 sm:block" onClick={readme.download}>⬇ .md</button>
         <button className={primary} onClick={readme.copy}>{readme.copied ? "✓ কপি হয়েছে" : "📋 README কপি"}</button>
+      </>
+    ) : view === "portfolio" ? (
+      <>
+        <button className="hidden rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 sm:block" onClick={openPortfolio}>↗ নতুন ট্যাবে</button>
+        <button className={primary} onClick={downloadPortfolio}>⬇ index.html</button>
       </>
     ) : (
       <button className={primary} onClick={downloadPDF}>⬇ PDF<span className="hidden sm:inline"> ডাউনলোড</span></button>
@@ -95,6 +111,7 @@ export default function BuilderPage() {
         <aside className={`space-y-3 overflow-y-auto p-4 lg:h-full print:hidden ${pane === "edit" ? "" : "hidden lg:block"}`}>
           {view === "cv" && <CVSettingsPanel />}
           {view === "readme" && <ReadmeSettingsPanel />}
+          {view === "portfolio" && <PortfolioSettingsPanel />}
           {loaded && leftovers.length > 0 && (
             <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
               <p className="font-semibold">⚠️ নমুনা ডেটা এখনো রয়ে গেছে</p>
@@ -106,18 +123,20 @@ export default function BuilderPage() {
           )}
           {loaded && isEmpty && (
             <div className="rounded-xl border border-teal-200 bg-teal-50 p-3 text-sm text-teal-900">
-              <p>👋 নিচের ফর্ম পূরণ করুন, ডান পাশে {view === "readme" ? "README" : "CV"} তৈরি হতে দেখবেন। একবার তথ্য দিলেই CV, README আর পোর্টফোলিও তিনটাই তৈরি হবে।</p>
+              <p>👋 নিচের ফর্ম পূরণ করুন, ডান পাশে {view === "readme" ? "README" : view === "portfolio" ? "পোর্টফোলিও" : "CV"} তৈরি হতে দেখবেন। একবার তথ্য দিলেই CV, README আর পোর্টফোলিও তিনটাই তৈরি হবে।</p>
               <button className="mt-2 text-xs font-semibold text-teal-700 underline" onClick={() => setCV(sampleCV)}>একটা নমুনা দেখতে চাই</button>
             </div>
           )}
           {loaded && <Editor cv={cv} setCV={setCV} hidden={hidden} toggleSection={toggleSection} />}
           {view === "readme" && <ReadmeHowTo user={githubUsername(cv.personal.github)} />}
+          {view === "portfolio" && <PortfolioHowTo github={cv.personal.github} />}
           <p className="pb-6 text-center text-[11px] text-slate-400">🔒 আপনার ডেটা শুধু আপনার ব্রাউজারেই সেভ থাকে, কোনো সার্ভারে যায় না।</p>
         </aside>
 
         <main className={`overflow-y-auto p-4 lg:h-full print:block print:h-auto print:overflow-visible print:p-0 ${pane === "preview" ? "" : "hidden lg:block"}`}>
           {loaded && view === "cv" && <Preview cv={shownCV} settings={settings} />}
           {loaded && view === "readme" && <ReadmePreviewPane markdown={markdown} />}
+          {loaded && view === "portfolio" && <PortfolioPreviewPane html={portfolioHtml} />}
         </main>
       </div>
     </div>

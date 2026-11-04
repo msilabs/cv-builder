@@ -84,6 +84,7 @@ export interface ReadmeSettings {
 
 export interface PortfolioSettings {
   theme: PortfolioTheme;
+  accent: string;
   showEmail: boolean;
   showPhone: boolean; // পাবলিক সাইট, তাই ডিফল্ট বন্ধ
   showLocation: boolean;
