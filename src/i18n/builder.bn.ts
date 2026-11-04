@@ -2,6 +2,34 @@
 const n = (x: number) => x.toLocaleString("bn-BD");
 
 export const builderBn = {
+  dialogs: { ok: "ঠিক আছে", cancel: "বাতিল", continue: "তবুও চালিয়ে যান", delete: "মুছে ফেলুন", load: "লোড করুন", save: "সেভ করুন", clear: "সব মুছুন" },
+  toast: {
+    copied: "কপি হয়েছে",
+    imported: "ইমপোর্ট হয়েছে",
+    backup: "ব্যাকআপ ফাইল ডাউনলোড হয়েছে",
+    versionCreated: (name: string) => `"${name}" তৈরি হয়েছে`,
+    versionDeleted: "ভার্সন মুছে ফেলা হয়েছে",
+    renamed: "নাম বদলানো হয়েছে",
+    downloaded: "ডাউনলোড হয়েছে",
+  },
+  progress: {
+    title: "CV কতটা তৈরি",
+    done: "দারুণ! আপনার CV তৈরি 🎉",
+    next: "এরপর:",
+    items: {
+      basics: "নাম আর পদবি দিন",
+      contact: "ইমেইল আর মোবাইল নম্বর দিন",
+      links: "GitHub বা LinkedIn লিংক দিন",
+      summary: "২–৩ লাইনের সামারি লিখুন",
+      skills: "অন্তত ২টা স্কিল গ্রুপ যোগ করুন",
+      work: "কাজের অভিজ্ঞতা বা ২টা প্রজেক্ট যোগ করুন",
+      projects: "অন্তত ১টা প্রজেক্ট যোগ করুন",
+      education: "শিক্ষাগত যোগ্যতা যোগ করুন",
+    },
+  },
+  zoom: { fit: "ফিট", in: "বড় করুন", out: "ছোট করুন" },
+  emptyPreview: { title: "এখানে আপনার CV দেখাবে", body: "বাঁ পাশের ফর্মে লেখা শুরু করুন, সাথে সাথে এখানে দেখতে পাবেন।", bodyMobile: "এডিট-এ গিয়ে ফর্মে লেখা শুরু করুন।" },
+  item: { collapse: "ছোট করুন", expand: "খুলুন" },
   toolbar: { more: "আরও", language: "ভাষা", home: "হোম পেজ" },
   views: { cv: "CV", readme: "GitHub README", portfolio: "পোর্টফোলিও" },
   pane: { edit: "✏️ এডিট", preview: "👁 প্রিভিউ" },

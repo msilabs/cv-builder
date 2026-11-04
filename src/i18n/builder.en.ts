@@ -3,6 +3,34 @@ import type { builderBn } from "./builder.bn";
 const plural = (c: number, one: string, many = `${one}s`) => `${c} ${c === 1 ? one : many}`;
 
 export const builderEn: typeof builderBn = {
+  dialogs: { ok: "OK", cancel: "Cancel", continue: "Continue anyway", delete: "Delete", load: "Load", save: "Save", clear: "Clear all" },
+  toast: {
+    copied: "Copied",
+    imported: "Imported",
+    backup: "Backup file downloaded",
+    versionCreated: (name) => `"${name}" created`,
+    versionDeleted: "Version deleted",
+    renamed: "Renamed",
+    downloaded: "Downloaded",
+  },
+  progress: {
+    title: "CV progress",
+    done: "Great! Your CV is ready 🎉",
+    next: "Next:",
+    items: {
+      basics: "Add your name and title",
+      contact: "Add your email and phone",
+      links: "Add a GitHub or LinkedIn link",
+      summary: "Write a 2–3 line summary",
+      skills: "Add at least 2 skill groups",
+      work: "Add work experience or 2 projects",
+      projects: "Add at least 1 project",
+      education: "Add your education",
+    },
+  },
+  zoom: { fit: "Fit", in: "Zoom in", out: "Zoom out" },
+  emptyPreview: { title: "Your CV will appear here", body: "Start typing in the form on the left and it shows up here instantly.", bodyMobile: "Go to Edit and start filling in the form." },
+  item: { collapse: "Collapse", expand: "Expand" },
   toolbar: { more: "More", language: "Language", home: "Home page" },
   views: { cv: "CV", readme: "GitHub README", portfolio: "Portfolio" },
   pane: { edit: "✏️ Edit", preview: "👁 Preview" },

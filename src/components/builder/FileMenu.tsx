@@ -1,4 +1,5 @@
 "use client";
+import { useDialogs } from "@/components/ui/Dialogs";
 import { useLang } from "@/i18n/lang";
 import { useRef } from "react";
 import { Menu, MenuDivider, MenuItem } from "@/components/toolbar/Menu";
@@ -17,6 +18,7 @@ export function FileMenu({ isEmpty, onImport }: { isEmpty: boolean; onImport: (r
   const { profile, setCV, data, markBackup } = useStore();
   const { t } = useLang();
   const L = t.b.file;
+  const { confirm, toast } = useDialogs();
   const fileRef = useRef<HTMLInputElement>(null);
   const warn = needsBackup(data.lastBackupAt, !isEmpty);
   const last = data.lastBackupAt ? L.daysAgo(Math.max(0, Math.floor((Date.now() - data.lastBackupAt) / DAY))) : L.never;
@@ -27,7 +29,7 @@ export function FileMenu({ isEmpty, onImport }: { isEmpty: boolean; onImport: (r
       onImport(parseImport(extractJSON(await f.text())));
     } catch (e) {
       const m = (e as Error).message;
-      alert(L.openError(t.b.errors[m] ?? t.b.errors.parse));
+      toast(L.openError(t.b.errors[m] ?? t.b.errors.parse), "error");
     }
   };
 
@@ -36,17 +38,17 @@ export function FileMenu({ isEmpty, onImport }: { isEmpty: boolean; onImport: (r
       <Menu label={<>📁 <span className="hidden lg:inline">{L.menu}</span></>} badge={warn}>
         {(close) => (
           <>
-            <MenuItem onClick={() => { exportProfile(profile); markBackup(); close(); }} hint={L.lastBackup(last)}>
+            <MenuItem onClick={() => { exportProfile(profile); markBackup(); close(); toast(t.b.toast.backup); }} hint={L.lastBackup(last)}>
               {L.save}
             </MenuItem>
             <MenuItem onClick={() => { fileRef.current?.click(); close(); }} hint={L.importHint}>
               {L.import}
             </MenuItem>
             <MenuDivider />
-            <MenuItem onClick={() => { if (isEmpty || confirm(L.confirmSample)) setCV(sampleCV); close(); }}>
+            <MenuItem onClick={async () => { close(); if (isEmpty || (await confirm({ message: L.confirmSample, confirmLabel: t.b.dialogs.load }))) setCV(sampleCV); }}>
               {L.sample}
             </MenuItem>
-            <MenuItem danger onClick={() => { if (confirm(L.confirmClear)) setCV(emptyCV); close(); }}>
+            <MenuItem danger onClick={async () => { close(); if (await confirm({ message: L.confirmClear, confirmLabel: t.b.dialogs.clear, danger: true })) setCV(emptyCV); }}>
               {L.clear}
             </MenuItem>
             {warn && (

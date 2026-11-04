@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DialogProvider } from "@/components/ui/Dialogs";
 import { LangProvider } from "@/i18n/lang";
 import { StoreProvider } from "@/lib/store";
 
@@ -10,7 +11,9 @@ export const metadata: Metadata = {
 export default function BuilderLayout({ children }: { children: React.ReactNode }) {
   return (
     <LangProvider>
-      <StoreProvider>{children}</StoreProvider>
+      <DialogProvider>
+        <StoreProvider>{children}</StoreProvider>
+      </DialogProvider>
     </LangProvider>
   );
 }

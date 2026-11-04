@@ -5,6 +5,7 @@ import type { AITask } from "@/lib/ai";
 import { templates } from "@/components/templates";
 import { AIPanel } from "@/components/ai/AIPanel";
 import { CVSettingsPanel } from "@/components/builder/CVSettingsPanel";
+import { ProgressCard } from "@/components/builder/ProgressCard";
 import { FileMenu } from "@/components/builder/FileMenu";
 import { ImportDialog } from "@/components/builder/ImportDialog";
 import { Toolbar } from "@/components/builder/Toolbar";
@@ -19,6 +20,7 @@ import { type ImportResult, readImportFile } from "@/lib/normalize";
 import { generatePortfolio } from "@/lib/portfolio";
 import { generateReadme, githubUsername } from "@/lib/readme";
 import { emptyCV, findSampleLeftovers, isEmptyCV, sampleCV, visibleCV } from "@/lib/sample";
+import { useDialogs } from "@/components/ui/Dialogs";
 import { useLang } from "@/i18n/lang";
 import { useStore } from "@/lib/store";
 import type { CV, SectionKey, Settings, TemplateId } from "@/lib/types";
@@ -32,6 +34,7 @@ export default function BuilderPage() {
   const { cv, setCV, settings, setSettings, loaded, profile } = useStore();
   const { t } = useLang();
   const B = t.b;
+  const { confirm, toast } = useDialogs();
   const [aiOpen, setAiOpen] = useState(false);
   const [aiTask, setAiTask] = useState<AITask | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
@@ -73,14 +76,19 @@ export default function BuilderPage() {
     if (isEmpty) {
       setCV(r.cv);
       if (r.settings) setSettings(r.settings);
+      toast(B.toast.imported);
     } else setPendingImport(r);
   };
 
-  const okToExport = (what: string) =>
-    !leftovers.length || confirm(B.confirmLeftover(what, leftovers.join(", ")));
+  const okToExport = async (what: string) =>
+    !leftovers.length || (await confirm({ message: B.confirmLeftover(what, leftovers.join(", ")), confirmLabel: B.dialogs.continue }));
 
   const portfolioHtml = useMemo(() => (view === "portfolio" ? generatePortfolio(shownCV, settings.portfolio) : ""), [view, shownCV, settings.portfolio]);
-  const downloadPortfolio = () => okToExport(B.views.portfolio) && downloadText("index.html", portfolioHtml, "text/html");
+  const downloadPortfolio = async () => {
+    if (!(await okToExport(B.views.portfolio))) return;
+    downloadText("index.html", portfolioHtml, "text/html");
+    toast(B.toast.downloaded);
+  };
   const openPortfolio = () => {
     const url = URL.createObjectURL(new Blob([portfolioHtml], { type: "text/html" }));
     window.open(url, "_blank", "noopener");
@@ -89,8 +97,8 @@ export default function BuilderPage() {
 
   const readme = useReadmeActions(markdown, () => okToExport("README"));
 
-  const downloadPDF = () => {
-    if (!okToExport("CV")) return;
+  const downloadPDF = async () => {
+    if (!(await okToExport("CV"))) return;
     const prev = document.title;
     document.title = `${cv.personal.fullName || "CV"} - CV`.replace(/[\\/:*?"<>|]/g, "");
     window.print();
@@ -109,7 +117,7 @@ export default function BuilderPage() {
       onImport(await readImportFile(f));
     } catch (e) {
       const m = (e as Error).message;
-      alert(B.file.openError(B.errors[m] ?? B.errors.parse));
+      toast(B.file.openError(B.errors[m] ?? B.errors.parse), "error");
     }
   };
   const focusName = () => {
@@ -179,6 +187,7 @@ export default function BuilderPage() {
               </div>
             </div>
           )}
+          {loaded && !isEmpty && <ProgressCard cv={cv} />}
           {view === "cv" && <CVSettingsPanel />}
           {view === "readme" && <ReadmeSettingsPanel />}
           {view === "portfolio" && <PortfolioSettingsPanel />}
@@ -186,7 +195,7 @@ export default function BuilderPage() {
             <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
               <p className="font-semibold">{B.leftover.title}</p>
               <p className="mt-1">{B.leftover.body} <b>{leftovers.join(", ")}</b></p>
-              <button className="mt-2 rounded-md bg-amber-600 px-3 py-1 text-xs font-semibold text-white hover:bg-amber-700" onClick={() => confirm(B.leftover.confirmClear) && setCV(emptyCV)}>
+              <button className="mt-2 rounded-md bg-amber-600 px-3 py-1 text-xs font-semibold text-white hover:bg-amber-700" onClick={async () => (await confirm({ message: B.leftover.confirmClear, confirmLabel: B.dialogs.clear, danger: true })) && setCV(emptyCV)}>
                 {B.leftover.clear}
               </button>
             </div>
@@ -217,7 +226,7 @@ export default function BuilderPage() {
         </aside>
 
         <main className={`overflow-y-auto bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] p-4 pb-24 [background-size:18px_18px] lg:h-full lg:pb-4 print:block print:bg-none print:h-auto print:overflow-visible print:p-0 ${pane === "preview" ? "" : "hidden lg:block"}`}>
-          {loaded && view === "cv" && <Preview cv={shownCV} settings={settings} />}
+          {loaded && view === "cv" && <Preview cv={shownCV} settings={settings} empty={isEmpty} />}
           {loaded && view === "readme" && <ReadmePreviewPane markdown={markdown} />}
           {loaded && view === "portfolio" && <PortfolioPreviewPane html={portfolioHtml} />}
         </main>

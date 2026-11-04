@@ -1,12 +1,16 @@
 "use client";
+import { useDialogs } from "@/components/ui/Dialogs";
 import { useLang } from "@/i18n/lang";
 import type { CV, SectionKey, Education, Experience, Project, SimpleItem, SkillGroup } from "@/lib/types";
-import { uid } from "@/lib/utils";
+import { cvProgress } from "@/lib/progress";
+import { commaList, fmtRange, uid } from "@/lib/utils";
 import { AddButton, Field, ItemCard, listOps, Section } from "./fields";
 
 export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; setCV: (fn: (c: CV) => CV) => void; hidden: SectionKey[]; toggleSection: (k: SectionKey) => void }) {
   const { t } = useLang();
+  const { toast } = useDialogs();
   const L = t.b.editor;
+  const prog = cvProgress(cv);
   const vis = (k: SectionKey) => ({ visible: !hidden.includes(k), onToggleVisible: () => toggleSection(k) });
   const set = <K extends keyof CV>(k: K, v: CV[K]) => setCV((c) => ({ ...c, [k]: v }));
   const setP = (k: keyof CV["personal"], v: string) => setCV((c) => ({ ...c, personal: { ...c.personal, [k]: v } }));
@@ -19,7 +23,7 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
 
   const onPhoto = (f?: File) => {
     if (!f) return;
-    if (f.size > 1.5 * 1024 * 1024) return alert(L.photoTooBig);
+    if (f.size > 1.5 * 1024 * 1024) return toast(L.photoTooBig, "error");
     const r = new FileReader();
     r.onload = () => setP("photo", String(r.result));
     r.readAsDataURL(f);
@@ -27,7 +31,7 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
 
   return (
     <div className="space-y-3">
-      <Section title={L.personal} icon="👤" defaultOpen>
+      <Section id="personal" done={prog.sectionDone("personal")} title={L.personal} icon="👤" defaultOpen>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field id="field-fullName" label={L.fullName} value={p.fullName} onChange={(v) => setP("fullName", v)} placeholder="Tanvir Ahmed" />
           <Field label={L.title} value={p.title} onChange={(v) => setP("title", v)} placeholder="Flutter Developer" />
@@ -69,7 +73,7 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
         <p className="text-[11px] text-slate-400">{L.photoTip}</p>
       </Section>
 
-      <Section {...vis("summary")} title={L.summary} icon="📝">
+      <Section {...vis("summary")} id="summary" done={prog.sectionDone("summary")} title={L.summary} icon="📝">
         <Field
           label={L.summaryLabel} textarea value={cv.summary} onChange={(v) => set("summary", v)}
           placeholder="Backend developer with 2+ years of experience in Node.js..."
@@ -77,19 +81,24 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
         />
       </Section>
 
-      <Section {...vis("skills")} title={L.skills} icon="🛠️" count={cv.skills.length}>
+      <Section {...vis("skills")} id="skills" done={prog.sectionDone("skills")} title={L.skills} icon="🛠️" count={cv.skills.length}>
         {cv.skills.map((s, i) => (
-          <ItemCard key={s.id} title={s.name || L.newGroup} onRemove={() => sk.remove(s.id)} onUp={i > 0 ? () => sk.move(i, -1) : undefined} onDown={i < cv.skills.length - 1 ? () => sk.move(i, 1) : undefined}>
+          <ItemCard key={s.id} title={s.name || L.newGroup} subtitle={commaList(s.items).join(", ")} onRemove={() => sk.remove(s.id)} onUp={i > 0 ? () => sk.move(i, -1) : undefined} onDown={i < cv.skills.length - 1 ? () => sk.move(i, 1) : undefined}>
             <Field label={L.groupName} value={s.name} onChange={(v) => sk.update(s.id, { name: v })} placeholder="Frontend" />
             <Field label={L.groupItems} value={s.items} onChange={(v) => sk.update(s.id, { items: v })} placeholder="React, Next.js, Tailwind" />
+            {commaList(s.items).length > 0 && (
+              <div className="flex flex-wrap gap-1 sm:col-span-2" aria-hidden>
+                {commaList(s.items).map((x, j) => <span key={j} className="rounded-md bg-white px-2 py-0.5 text-xs text-slate-600 ring-1 ring-slate-200">{x}</span>)}
+              </div>
+            )}
           </ItemCard>
         ))}
         <AddButton onClick={() => sk.add({ id: uid(), name: "", items: "" })}>{L.addGroup}</AddButton>
       </Section>
 
-      <Section {...vis("experience")} title={L.experience} icon="💼" count={cv.experience.length}>
+      <Section {...vis("experience")} id="experience" done={cv.experience.length > 0} title={L.experience} icon="💼" count={cv.experience.length}>
         {cv.experience.map((e, i) => (
-          <ItemCard key={e.id} title={e.role || e.company || L.newExperience} onRemove={() => exp.remove(e.id)} onUp={i > 0 ? () => exp.move(i, -1) : undefined} onDown={i < cv.experience.length - 1 ? () => exp.move(i, 1) : undefined}>
+          <ItemCard key={e.id} title={e.role || e.company || L.newExperience} subtitle={[e.company, fmtRange(e.start, e.end, e.current)].filter(Boolean).join(" · ")} onRemove={() => exp.remove(e.id)} onUp={i > 0 ? () => exp.move(i, -1) : undefined} onDown={i < cv.experience.length - 1 ? () => exp.move(i, 1) : undefined}>
             <Field label={L.role} value={e.role} onChange={(v) => exp.update(e.id, { role: v })} placeholder="Software Engineer" />
             <Field label={L.company} value={e.company} onChange={(v) => exp.update(e.id, { company: v })} placeholder="Company Ltd." />
             <Field label={L.expLocation} value={e.location} onChange={(v) => exp.update(e.id, { location: v })} placeholder="Dhaka / Remote" />
@@ -111,9 +120,9 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
         <AddButton onClick={() => exp.add({ id: uid(), company: "", role: "", location: "", start: "", end: "", current: false, bullets: "" })}>{L.addExperience}</AddButton>
       </Section>
 
-      <Section {...vis("projects")} title={L.projects} icon="🚀" count={cv.projects.length}>
+      <Section {...vis("projects")} id="projects" done={prog.sectionDone("projects")} title={L.projects} icon="🚀" count={cv.projects.length}>
         {cv.projects.map((pr, i) => (
-          <ItemCard key={pr.id} title={pr.name || L.newProject} onRemove={() => proj.remove(pr.id)} onUp={i > 0 ? () => proj.move(i, -1) : undefined} onDown={i < cv.projects.length - 1 ? () => proj.move(i, 1) : undefined}>
+          <ItemCard key={pr.id} title={pr.name || L.newProject} subtitle={pr.tech} onRemove={() => proj.remove(pr.id)} onUp={i > 0 ? () => proj.move(i, -1) : undefined} onDown={i < cv.projects.length - 1 ? () => proj.move(i, 1) : undefined}>
             <Field label={L.projectName} value={pr.name} onChange={(v) => proj.update(pr.id, { name: v })} placeholder="E-commerce App" />
             <Field label={L.tech} value={pr.tech} onChange={(v) => proj.update(pr.id, { tech: v })} placeholder="Flutter, Firebase" />
             <Field label={L.link} value={pr.link} onChange={(v) => proj.update(pr.id, { link: v })} placeholder="myapp.com" />
@@ -130,9 +139,9 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
         <AddButton onClick={() => proj.add({ id: uid(), name: "", tech: "", link: "", repo: "", featured: false, bullets: "" })}>{L.addProject}</AddButton>
       </Section>
 
-      <Section {...vis("education")} title={L.education} icon="🎓" count={cv.education.length}>
+      <Section {...vis("education")} id="education" done={prog.sectionDone("education")} title={L.education} icon="🎓" count={cv.education.length}>
         {cv.education.map((ed, i) => (
-          <ItemCard key={ed.id} title={ed.degree || L.newDegree} onRemove={() => edu.remove(ed.id)} onUp={i > 0 ? () => edu.move(i, -1) : undefined} onDown={i < cv.education.length - 1 ? () => edu.move(i, 1) : undefined}>
+          <ItemCard key={ed.id} title={ed.degree || L.newDegree} subtitle={[ed.institution, ed.result].filter(Boolean).join(" · ")} onRemove={() => edu.remove(ed.id)} onUp={i > 0 ? () => edu.move(i, -1) : undefined} onDown={i < cv.education.length - 1 ? () => edu.move(i, 1) : undefined}>
             <Field label={L.degree} value={ed.degree} onChange={(v) => edu.update(ed.id, { degree: v })} placeholder="B.Sc. in CSE / HSC / SSC" />
             <Field label={L.institution} value={ed.institution} onChange={(v) => edu.update(ed.id, { institution: v })} placeholder="University / College name" />
             <Field label={L.result} value={ed.result} onChange={(v) => edu.update(ed.id, { result: v })} placeholder="CGPA: 3.50 / 4.00" hint={L.resultHint} />

@@ -86,17 +86,19 @@ export function ReadmePreviewPane({ markdown }: { markdown: string }) {
   );
 }
 
-export function useReadmeActions(markdown: string, beforeExport: () => boolean) {
+export function useReadmeActions(markdown: string, beforeExport: () => Promise<boolean>) {
   const [copied, setCopied] = useState(false);
   return {
     copied,
     copy: async () => {
-      if (!beforeExport()) return;
+      if (!(await beforeExport())) return;
       if (await copyText(markdown)) {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       }
     },
-    download: () => beforeExport() && downloadText("README.md", markdown, "text/markdown"),
+    download: async () => {
+      if (await beforeExport()) downloadText("README.md", markdown, "text/markdown");
+    },
   };
 }

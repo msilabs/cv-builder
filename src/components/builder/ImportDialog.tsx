@@ -1,4 +1,5 @@
 "use client";
+import { useDialogs } from "@/components/ui/Dialogs";
 import { useLang } from "@/i18n/lang";
 import { useState } from "react";
 import { Modal } from "@/components/ui/Modal";
@@ -12,16 +13,19 @@ export function ImportDialog({ result, onClose }: { result: ImportResult | null;
   const [name, setName] = useState("");
   const { t } = useLang();
   const L = t.b.importDlg;
+  const { toast } = useDialogs();
   if (!result) return null;
   const defName = result.name || result.cv.personal.fullName || L.defaultName;
   const replace = () => {
     setCV(result.cv);
     if (result.settings) setSettings(result.settings);
     onClose();
+    toast(t.b.toast.imported);
   };
   const asNew = () => {
     addProfile(name.trim() || defName, result.cv, result.settings);
     onClose();
+    toast(t.b.toast.versionCreated(name.trim() || defName));
   };
   const c = result.cv;
   return (

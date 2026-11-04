@@ -1,4 +1,5 @@
 "use client";
+import { useDialogs } from "@/components/ui/Dialogs";
 import { useLang } from "@/i18n/lang";
 import { Menu, MenuDivider, MenuItem } from "@/components/toolbar/Menu";
 import { btnOutline } from "@/components/ui/styles";
@@ -13,16 +14,14 @@ const ago = (time: number, A: { now: string; min: (x: number) => string; hour: (
   return A.day(Math.round(h / 24));
 };
 
-const askName = (msg: string, def: string) => {
-  const v = prompt(msg, def);
-  return v?.trim() ? v.trim().slice(0, 60) : null;
-};
 
 // একাধিক CV ভার্সন: মূল CV, নির্দিষ্ট জবের জন্য আলাদা CV ইত্যাদি
 export function VersionSwitcher() {
   const { data, profile, switchProfile, addProfile, duplicateProfile, renameProfile, deleteProfile } = useStore();
   const { t } = useLang();
   const L = t.b.versions;
+  const { prompt, confirm, toast } = useDialogs();
+  const askName = (title: string, defaultValue: string) => prompt({ title, defaultValue });
   return (
     <Menu align="left"
       buttonClass={`${btnOutline} max-w-[8.5rem] !justify-start px-2.5 sm:max-w-[16rem]`}
@@ -43,24 +42,27 @@ export function VersionSwitcher() {
             ))}
           </div>
           <MenuDivider />
-          <MenuItem hint={L.duplicateHint} onClick={() => {
-            const n = askName(L.duplicatePrompt, `${profile.name}${L.copySuffix}`);
-            if (n) duplicateProfile(profile.id, n);
+          <MenuItem hint={L.duplicateHint} onClick={async () => {
             close();
+            const n = await askName(L.duplicatePrompt, `${profile.name}${L.copySuffix}`);
+            if (n) { duplicateProfile(profile.id, n); toast(t.b.toast.versionCreated(n)); }
           }}>{L.duplicate}</MenuItem>
-          <MenuItem onClick={() => {
-            const n = askName(L.addPrompt, L.addDefault);
-            if (n) addProfile(n);
+          <MenuItem onClick={async () => {
             close();
+            const n = await askName(L.addPrompt, L.addDefault);
+            if (n) { addProfile(n); toast(t.b.toast.versionCreated(n)); }
           }}>{L.add}</MenuItem>
-          <MenuItem onClick={() => {
-            const n = askName(L.renamePrompt, profile.name);
-            if (n) renameProfile(profile.id, n);
+          <MenuItem onClick={async () => {
             close();
+            const n = await askName(L.renamePrompt, profile.name);
+            if (n) { renameProfile(profile.id, n); toast(t.b.toast.renamed); }
           }}>{L.rename}</MenuItem>
-          <MenuItem danger onClick={() => {
-            if (confirm(L.confirmRemove(profile.name))) deleteProfile(profile.id);
+          <MenuItem danger onClick={async () => {
             close();
+            if (await confirm({ message: L.confirmRemove(profile.name), confirmLabel: t.b.dialogs.delete, danger: true })) {
+              deleteProfile(profile.id);
+              toast(t.b.toast.versionDeleted, "info");
+            }
           }}>{L.remove}</MenuItem>
         </div>
       )}
