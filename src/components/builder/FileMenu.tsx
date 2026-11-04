@@ -7,11 +7,12 @@ import { exportProfile } from "@/lib/files";
 import { extractJSON, parseImport, type ImportResult } from "@/lib/normalize";
 import { emptyCV, sampleCV } from "@/lib/sample";
 import { useStore } from "@/lib/store";
+import { useNow } from "@/lib/useNow";
 
 const DAY = 24 * 60 * 60 * 1000;
 
-export function needsBackup(lastBackupAt: number | null, hasData: boolean) {
-  return hasData && (!lastBackupAt || Date.now() - lastBackupAt > 7 * DAY);
+export function needsBackup(lastBackupAt: number | null, hasData: boolean, now: number) {
+  return hasData && (!lastBackupAt || now - lastBackupAt > 7 * DAY);
 }
 
 export function FileMenu({ isEmpty, onImport }: { isEmpty: boolean; onImport: (r: ImportResult) => void }) {
@@ -20,8 +21,9 @@ export function FileMenu({ isEmpty, onImport }: { isEmpty: boolean; onImport: (r
   const L = t.b.file;
   const { confirm, toast } = useDialogs();
   const fileRef = useRef<HTMLInputElement>(null);
-  const warn = needsBackup(data.lastBackupAt, !isEmpty);
-  const last = data.lastBackupAt ? L.daysAgo(Math.max(0, Math.floor((Date.now() - data.lastBackupAt) / DAY))) : L.never;
+  const now = useNow(60000);
+  const warn = needsBackup(data.lastBackupAt, !isEmpty, now);
+  const last = data.lastBackupAt ? L.daysAgo(Math.max(0, Math.floor((now - data.lastBackupAt) / DAY))) : L.never;
 
   const readFile = async (f?: File) => {
     if (!f) return;

@@ -16,7 +16,10 @@ function useStars() {
     const key = "cvbanao:stars";
     try {
       const c = JSON.parse(sessionStorage.getItem(key) || "null");
-      if (c && Date.now() - c.t < 30 * 60 * 1000) return setStars(c.n);
+      if (c && Date.now() - c.t < 30 * 60 * 1000) {
+        Promise.resolve(c.n).then(setStars);
+        return;
+      }
     } catch {}
     fetch(`https://api.github.com/repos/${REPO}`)
       .then((r) => (r.ok ? r.json() : null))

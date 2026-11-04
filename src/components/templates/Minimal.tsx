@@ -2,16 +2,19 @@ import type { TemplateProps } from "@/lib/types";
 import { commaList, fmtRange, href, stripProtocol } from "@/lib/utils";
 import { Bullets, contactItems, Ext } from "./shared";
 
-// বাম পাশে সেকশন লেবেল সহ মিনিমাল টেমপ্লেট
-export default function Minimal({ cv, settings }: TemplateProps) {
-  const { accent, showPhoto } = settings;
-  const p = cv.personal;
-  const Row = ({ label, children }: { label: string; children: React.ReactNode }) => (
+function Row({ label, children, accent }: { label: string; children: React.ReactNode; accent: string }) {
+  return (
     <section className="grid grid-cols-[28mm_1fr] gap-4 border-t border-neutral-200 pt-3 mt-3">
       <h2 className="text-[8.5pt] font-semibold uppercase tracking-widest" style={{ color: accent }}>{label}</h2>
       <div>{children}</div>
     </section>
   );
+}
+
+// বাম পাশে সেকশন লেবেল সহ মিনিমাল টেমপ্লেট
+export default function Minimal({ cv, settings }: TemplateProps) {
+  const { accent, showPhoto } = settings;
+  const p = cv.personal;
 
   return (
     <div className="text-[9.4pt] leading-[1.45] text-neutral-700">
@@ -32,13 +35,13 @@ export default function Minimal({ cv, settings }: TemplateProps) {
       </header>
 
       {cv.summary && (
-        <Row label="Profile">
+        <Row accent={accent} label="Profile">
           <p>{cv.summary}</p>
         </Row>
       )}
 
       {cv.skills.length > 0 && (
-        <Row label="Skills">
+        <Row accent={accent} label="Skills">
           <div className="space-y-0.5">
             {cv.skills.map((s) => (
               <p key={s.id}>
@@ -52,7 +55,7 @@ export default function Minimal({ cv, settings }: TemplateProps) {
       )}
 
       {cv.experience.length > 0 && (
-        <Row label="Experience">
+        <Row accent={accent} label="Experience">
           <div className="space-y-3">
             {cv.experience.map((e) => (
               <div key={e.id} className="break-inside-avoid">
@@ -72,7 +75,7 @@ export default function Minimal({ cv, settings }: TemplateProps) {
       )}
 
       {cv.projects.length > 0 && (
-        <Row label="Projects">
+        <Row accent={accent} label="Projects">
           <div className="space-y-3">
             {cv.projects.map((pr) => (
               <div key={pr.id} className="break-inside-avoid">
@@ -95,7 +98,7 @@ export default function Minimal({ cv, settings }: TemplateProps) {
       )}
 
       {cv.education.length > 0 && (
-        <Row label="Education">
+        <Row accent={accent} label="Education">
           <div className="space-y-2">
             {cv.education.map((ed) => (
               <div key={ed.id} className="break-inside-avoid">
@@ -114,17 +117,17 @@ export default function Minimal({ cv, settings }: TemplateProps) {
       )}
 
       {cv.achievements.length > 0 && (
-        <Row label="Achievements">
+        <Row accent={accent} label="Achievements">
           <Bullets text={cv.achievements.map((a) => a.text).join("\n")} />
         </Row>
       )}
       {cv.certifications.length > 0 && (
-        <Row label="Certifications">
+        <Row accent={accent} label="Certifications">
           <Bullets text={cv.certifications.map((a) => a.text).join("\n")} />
         </Row>
       )}
       {cv.languages && (
-        <Row label="Languages">
+        <Row accent={accent} label="Languages">
           <p>{cv.languages}</p>
         </Row>
       )}

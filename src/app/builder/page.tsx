@@ -6,6 +6,7 @@ import { templates } from "@/components/templates";
 import { AIPanel } from "@/components/ai/AIPanel";
 import { CVSettingsPanel } from "@/components/builder/CVSettingsPanel";
 import { ProgressCard } from "@/components/builder/ProgressCard";
+import { WelcomeCard } from "@/components/builder/WelcomeCard";
 import { FileMenu } from "@/components/builder/FileMenu";
 import { ImportDialog } from "@/components/builder/ImportDialog";
 import { Toolbar } from "@/components/builder/Toolbar";
@@ -120,6 +121,7 @@ export default function BuilderPage() {
       toast(B.file.openError(B.errors[m] ?? B.errors.parse), "error");
     }
   };
+  const openImport = () => importRef.current?.click();
   const focusName = () => {
     const el = document.getElementById("field-fullName");
     el?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -172,7 +174,7 @@ export default function BuilderPage() {
       <input ref={importRef} type="file" accept="application/json,.json,.txt" className="hidden" onChange={(e) => { importFile(e.target.files?.[0]); e.target.value = ""; }} />
 
       <ImportDialog result={pendingImport} onClose={() => setPendingImport(null)} />
-      <AIPanel open={aiOpen} initialTask={aiTask} onClose={() => { setAiOpen(false); setAiTask(null); }} onApplied={(prev, profileId, message) => setNotice({ prev, profileId, message })} />
+      <AIPanel key={aiOpen ? `open-${aiTask ?? "menu"}` : "closed"} open={aiOpen} initialTask={aiTask} onClose={() => { setAiOpen(false); setAiTask(null); }} onApplied={(prev, profileId, message) => setNotice({ prev, profileId, message })} />
       <div className="grid flex-1 lg:min-h-0 lg:grid-cols-[minmax(380px,520px)_1fr] print:block">
         <aside className={`space-y-3 overflow-y-auto p-4 pb-24 lg:h-full lg:pb-4 print:hidden ${pane === "edit" ? "" : "hidden lg:block"}`}>
           {notice && (
@@ -201,23 +203,7 @@ export default function BuilderPage() {
             </div>
           )}
           {loaded && isEmpty && (
-            <div className="rounded-xl border border-teal-200 bg-gradient-to-br from-teal-50 to-white p-4 text-sm text-slate-700 shadow-sm">
-              <p className="font-semibold text-slate-900">{B.welcome.title}</p>
-              <p className="mt-1 text-slate-600">{B.welcome.body(B.views[view])}</p>
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                {[
-                  { label: B.welcome.fill, onClick: focusName },
-                  { label: B.welcome.sample, onClick: () => setCV(sampleCV) },
-                  { label: B.welcome.ai, onClick: () => openAI("fromText") },
-                  { label: B.welcome.import, onClick: () => importRef.current?.click() },
-                ].map((x) => (
-                  <button key={x.label} type="button" onClick={x.onClick}
-                    className="rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:border-teal-400 hover:text-teal-800">
-                    {x.label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            <WelcomeCard what={B.views[view]} onFill={focusName} onSample={() => setCV(sampleCV)} onAI={() => openAI("fromText")} onImport={openImport} />
           )}
           {loaded && <Editor cv={cv} setCV={setCV} hidden={hidden} toggleSection={toggleSection} />}
           {view === "readme" && <ReadmeHowTo user={githubUsername(cv.personal.github)} />}

@@ -1,6 +1,6 @@
 "use client";
 // ভাষা: বাংলা ডিফল্ট; বাংলাদেশের বাইরের ব্রাউজারে প্রথমবার ইংরেজি; বাছাই মনে থাকে
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useSyncExternalStore } from "react";
 import { dict, type Dict, type Lang } from "./dict";
 
 export const LANG_KEY = "cvbanao:lang";
@@ -14,10 +14,24 @@ export function storedLang(): Lang | null {
   }
 }
 
+const LANG_EVENT = "cvbanao:lang-change";
+
 export function saveLang(l: Lang) {
   try {
     localStorage.setItem(LANG_KEY, l);
   } catch {}
+  if (typeof window !== "undefined") window.dispatchEvent(new Event(LANG_EVENT));
+}
+
+// ভাষা বদলালে (এই ট্যাবে বা অন্য ট্যাবে) সবাইকে জানানো
+function subscribeLang(cb: () => void) {
+  const onStorage = (e: StorageEvent) => e.key === LANG_KEY && cb();
+  window.addEventListener(LANG_EVENT, cb);
+  window.addEventListener("storage", onStorage);
+  return () => {
+    window.removeEventListener(LANG_EVENT, cb);
+    window.removeEventListener("storage", onStorage);
+  };
 }
 
 export function detectLang(): Lang {
@@ -40,17 +54,12 @@ interface Ctx {
 const LangCtx = createContext<Ctx>({ lang: "bn", t: dict.bn, setLang: () => {} });
 
 export function LangProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<Lang>("bn");
-  useEffect(() => {
-    setLangState(detectLang());
-  }, []);
+  // সার্ভারে (static build) বাংলা; ব্রাউজারে বাছাই করা বা চিনে নেওয়া ভাষা
+  const lang = useSyncExternalStore(subscribeLang, detectLang, () => "bn" as Lang);
   useEffect(() => {
     document.documentElement.lang = lang;
   }, [lang]);
-  const setLang = useCallback((l: Lang) => {
-    saveLang(l);
-    setLangState(l);
-  }, []);
+  const setLang = useCallback((l: Lang) => saveLang(l), []);
   return <LangCtx.Provider value={{ lang, t: dict[lang], setLang }}>{children}</LangCtx.Provider>;
 }
 

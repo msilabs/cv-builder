@@ -2,19 +2,25 @@ import type { TemplateProps } from "@/lib/types";
 import { commaList, fmtRange, href, stripProtocol } from "@/lib/utils";
 import { Bullets, contactItems, Ext } from "./shared";
 
-// সাইডবার সহ দুই কলাম টেমপ্লেট
-export default function Modern({ cv, settings }: TemplateProps) {
-  const { accent, showPhoto } = settings;
-  const p = cv.personal;
-  const H = ({ children }: { children: React.ReactNode }) => (
+function H({ children, accent }: { children: React.ReactNode; accent: string }) {
+  return (
     <h2 className="mb-2 mt-5 break-after-avoid flex items-center gap-2 text-[10.5pt] font-bold uppercase tracking-wider first:mt-0" style={{ color: accent }}>
       <span className="inline-block h-[2px] w-4" style={{ background: accent }} />
       {children}
     </h2>
   );
-  const SH = ({ children }: { children: React.ReactNode }) => (
+}
+
+function SH({ children }: { children: React.ReactNode }) {
+  return (
     <h2 className="mb-2 mt-5 text-[9.5pt] font-bold uppercase tracking-widest text-white/90 first:mt-0">{children}</h2>
   );
+}
+
+// সাইডবার সহ দুই কলাম টেমপ্লেট
+export default function Modern({ cv, settings }: TemplateProps) {
+  const { accent, showPhoto } = settings;
+  const p = cv.personal;
 
   return (
     <div className="grid min-h-[inherit] grid-cols-[34%_1fr] text-[9.3pt] leading-[1.42] text-neutral-800">
@@ -67,7 +73,7 @@ export default function Modern({ cv, settings }: TemplateProps) {
 
         {cv.experience.length > 0 && (
           <>
-            <H>Experience</H>
+            <H accent={accent}>Experience</H>
             <div className="space-y-3">
               {cv.experience.map((e) => (
                 <div key={e.id} className="break-inside-avoid">
@@ -88,7 +94,7 @@ export default function Modern({ cv, settings }: TemplateProps) {
 
         {cv.projects.length > 0 && (
           <>
-            <H>Projects</H>
+            <H accent={accent}>Projects</H>
             <div className="space-y-3">
               {cv.projects.map((pr) => (
                 <div key={pr.id} className="break-inside-avoid">
@@ -110,7 +116,7 @@ export default function Modern({ cv, settings }: TemplateProps) {
 
         {cv.education.length > 0 && (
           <>
-            <H>Education</H>
+            <H accent={accent}>Education</H>
             <div className="space-y-2">
               {cv.education.map((ed) => (
                 <div key={ed.id} className="break-inside-avoid">
@@ -130,7 +136,7 @@ export default function Modern({ cv, settings }: TemplateProps) {
 
         {(cv.achievements.length > 0 || cv.certifications.length > 0) && (
           <>
-            <H>Achievements & Certifications</H>
+            <H accent={accent}>Achievements & Certifications</H>
             <Bullets text={[...cv.achievements, ...cv.certifications].map((a) => a.text).join("\n")} />
           </>
         )}

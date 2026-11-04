@@ -111,7 +111,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipSave = useRef(true);
 
+  // ব্রাউজারের স্টোরেজ থেকে প্রথমবার লোড। static HTML-এর সাথে মিল রাখতে এটা mount-এর পরেই করতে হয়।
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- localStorage থেকে একবার hydrate করা
     setData(loadData());
     setLoaded(true);
   }, []);

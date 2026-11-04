@@ -2,15 +2,18 @@ import type { TemplateProps } from "@/lib/types";
 import { commaList, fmtRange, href, stripProtocol } from "@/lib/utils";
 import { Bullets, contactItems, Ext } from "./shared";
 
-// Serif ফন্ট, মাঝখানে হেডার: মার্জিত ও ক্লাসিক, এক কলাম তাই ATS-বান্ধব
-export default function Elegant({ cv, settings }: TemplateProps) {
-  const { accent } = settings;
-  const p = cv.personal;
-  const H = ({ children }: { children: React.ReactNode }) => (
+function H({ children, accent }: { children: React.ReactNode; accent: string }) {
+  return (
     <h2 className="mb-1.5 mt-4 break-after-avoid text-center text-[10pt] font-semibold uppercase tracking-[0.25em]" style={{ color: accent }}>
       <span className="inline-block border-b px-3 pb-0.5" style={{ borderColor: accent }}>{children}</span>
     </h2>
   );
+}
+
+// Serif ফন্ট, মাঝখানে হেডার: মার্জিত ও ক্লাসিক, এক কলাম তাই ATS-বান্ধব
+export default function Elegant({ cv, settings }: TemplateProps) {
+  const { accent } = settings;
+  const p = cv.personal;
   return (
     <div className="text-[9.6pt] leading-[1.45] text-neutral-800" style={{ fontFamily: 'Georgia, Cambria, "Times New Roman", serif' }}>
       <header className="text-center">
@@ -23,11 +26,11 @@ export default function Elegant({ cv, settings }: TemplateProps) {
         </p>
       </header>
 
-      {cv.summary && (<><H>Profile</H><p className="text-center italic">{cv.summary}</p></>)}
+      {cv.summary && (<><H accent={accent}>Profile</H><p className="text-center italic">{cv.summary}</p></>)}
 
       {cv.skills.length > 0 && (
         <>
-          <H>Expertise</H>
+          <H accent={accent}>Expertise</H>
           <div className="space-y-0.5">
             {cv.skills.map((s) => (
               <p key={s.id} className="grid grid-cols-[32mm_1fr] gap-3">
@@ -41,7 +44,7 @@ export default function Elegant({ cv, settings }: TemplateProps) {
 
       {cv.experience.length > 0 && (
         <>
-          <H>Experience</H>
+          <H accent={accent}>Experience</H>
           <div className="space-y-2.5">
             {cv.experience.map((e) => (
               <div key={e.id} className="break-inside-avoid">
@@ -59,7 +62,7 @@ export default function Elegant({ cv, settings }: TemplateProps) {
 
       {cv.projects.length > 0 && (
         <>
-          <H>Selected Projects</H>
+          <H accent={accent}>Selected Projects</H>
           <div className="space-y-2">
             {cv.projects.map((pr) => (
               <div key={pr.id} className="break-inside-avoid">
@@ -80,7 +83,7 @@ export default function Elegant({ cv, settings }: TemplateProps) {
 
       {cv.education.length > 0 && (
         <>
-          <H>Education</H>
+          <H accent={accent}>Education</H>
           {cv.education.map((ed) => (
             <div key={ed.id} className="mb-1 flex items-baseline justify-between gap-3 break-inside-avoid">
               <p><b className="text-neutral-900">{ed.degree}</b><br /><span className="italic">{ed.institution}</span>{ed.result && <span className="text-neutral-600"> · {ed.result}</span>}</p>
@@ -92,11 +95,11 @@ export default function Elegant({ cv, settings }: TemplateProps) {
 
       {(cv.achievements.length > 0 || cv.certifications.length > 0) && (
         <>
-          <H>Honours</H>
+          <H accent={accent}>Honours</H>
           <Bullets text={[...cv.achievements, ...cv.certifications].map((a) => a.text).join("\n")} />
         </>
       )}
-      {cv.languages && (<><H>Languages</H><p className="text-center">{cv.languages}</p></>)}
+      {cv.languages && (<><H accent={accent}>Languages</H><p className="text-center">{cv.languages}</p></>)}
     </div>
   );
 }

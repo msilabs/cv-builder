@@ -2,15 +2,18 @@ import type { TemplateProps } from "@/lib/types";
 import { commaList, fmtRange, href, stripProtocol } from "@/lib/utils";
 import { Bullets, contactItems, Ext } from "./shared";
 
-// ঘন, এক কলাম: বেশি তথ্য এক পৃষ্ঠায়, ATS-বান্ধব
-export default function Compact({ cv, settings }: TemplateProps) {
-  const { accent } = settings;
-  const p = cv.personal;
-  const H = ({ children }: { children: React.ReactNode }) => (
+function H({ children, accent }: { children: React.ReactNode; accent: string }) {
+  return (
     <h2 className="mb-1 mt-2.5 break-after-avoid border-b border-neutral-300 pb-[1px] text-[9.5pt] font-bold uppercase tracking-[0.12em]" style={{ color: accent }}>
       {children}
     </h2>
   );
+}
+
+// ঘন, এক কলাম: বেশি তথ্য এক পৃষ্ঠায়, ATS-বান্ধব
+export default function Compact({ cv, settings }: TemplateProps) {
+  const { accent } = settings;
+  const p = cv.personal;
   return (
     <div className="text-[8.9pt] leading-[1.35] text-neutral-800">
       <header className="flex items-end justify-between gap-6 border-b-2 pb-2" style={{ borderColor: accent }}>
@@ -25,11 +28,11 @@ export default function Compact({ cv, settings }: TemplateProps) {
         </ul>
       </header>
 
-      {cv.summary && (<><H>Summary</H><p>{cv.summary}</p></>)}
+      {cv.summary && (<><H accent={accent}>Summary</H><p>{cv.summary}</p></>)}
 
       {cv.skills.length > 0 && (
         <>
-          <H>Skills</H>
+          <H accent={accent}>Skills</H>
           {cv.skills.map((s) => (
             <p key={s.id}>
               <b className="text-neutral-900">{s.name}:</b> {commaList(s.items).join(", ")}
@@ -40,7 +43,7 @@ export default function Compact({ cv, settings }: TemplateProps) {
 
       {cv.experience.length > 0 && (
         <>
-          <H>Experience</H>
+          <H accent={accent}>Experience</H>
           <div className="space-y-1.5">
             {cv.experience.map((e) => (
               <div key={e.id} className="break-inside-avoid">
@@ -57,7 +60,7 @@ export default function Compact({ cv, settings }: TemplateProps) {
 
       {cv.projects.length > 0 && (
         <>
-          <H>Projects</H>
+          <H accent={accent}>Projects</H>
           <div className="space-y-1.5">
             {cv.projects.map((pr) => (
               <div key={pr.id} className="break-inside-avoid">
@@ -78,7 +81,7 @@ export default function Compact({ cv, settings }: TemplateProps) {
 
       {cv.education.length > 0 && (
         <>
-          <H>Education</H>
+          <H accent={accent}>Education</H>
           {cv.education.map((ed) => (
             <div key={ed.id} className="flex justify-between gap-3 break-inside-avoid">
               <p><b className="text-neutral-900">{ed.degree}</b>, {ed.institution}{ed.result && <span className="text-neutral-600"> — {ed.result}</span>}</p>
@@ -90,11 +93,11 @@ export default function Compact({ cv, settings }: TemplateProps) {
 
       {(cv.achievements.length > 0 || cv.certifications.length > 0) && (
         <>
-          <H>Achievements & Certifications</H>
+          <H accent={accent}>Achievements & Certifications</H>
           <Bullets text={[...cv.achievements, ...cv.certifications].map((a) => a.text).join("\n")} className="space-y-0" />
         </>
       )}
-      {cv.languages && (<><H>Languages</H><p>{cv.languages}</p></>)}
+      {cv.languages && (<><H accent={accent}>Languages</H><p>{cv.languages}</p></>)}
     </div>
   );
 }

@@ -2,15 +2,18 @@ import type { TemplateProps } from "@/lib/types";
 import { commaList, fmtRange, href, stripProtocol } from "@/lib/utils";
 import { Bullets, contactItems, Ext } from "./shared";
 
-// ATS-বান্ধব এক কলাম টেমপ্লেট
-export default function Classic({ cv, settings }: TemplateProps) {
-  const { accent } = settings;
-  const p = cv.personal;
-  const H = ({ children }: { children: React.ReactNode }) => (
+function H({ children, accent }: { children: React.ReactNode; accent: string }) {
+  return (
     <h2 className="mt-3 mb-1 break-after-avoid border-b pb-0.5 text-[10.5pt] font-bold uppercase tracking-wider" style={{ color: accent, borderColor: accent }}>
       {children}
     </h2>
   );
+}
+
+// ATS-বান্ধব এক কলাম টেমপ্লেট
+export default function Classic({ cv, settings }: TemplateProps) {
+  const { accent } = settings;
+  const p = cv.personal;
 
   return (
     <div className="text-[9.3pt] leading-[1.4] text-neutral-800">
@@ -29,14 +32,14 @@ export default function Classic({ cv, settings }: TemplateProps) {
 
       {cv.summary && (
         <>
-          <H>Summary</H>
+          <H accent={accent}>Summary</H>
           <p>{cv.summary}</p>
         </>
       )}
 
       {cv.skills.length > 0 && (
         <>
-          <H>Technical Skills</H>
+          <H accent={accent}>Technical Skills</H>
           <div className="space-y-0.5">
             {cv.skills.map((s) => (
               <p key={s.id}>
@@ -50,7 +53,7 @@ export default function Classic({ cv, settings }: TemplateProps) {
 
       {cv.experience.length > 0 && (
         <>
-          <H>Experience</H>
+          <H accent={accent}>Experience</H>
           <div className="space-y-2">
             {cv.experience.map((e) => (
               <div key={e.id} className="break-inside-avoid">
@@ -71,7 +74,7 @@ export default function Classic({ cv, settings }: TemplateProps) {
 
       {cv.projects.length > 0 && (
         <>
-          <H>Projects</H>
+          <H accent={accent}>Projects</H>
           <div className="space-y-2">
             {cv.projects.map((pr) => (
               <div key={pr.id} className="break-inside-avoid">
@@ -95,7 +98,7 @@ export default function Classic({ cv, settings }: TemplateProps) {
 
       {cv.education.length > 0 && (
         <>
-          <H>Education</H>
+          <H accent={accent}>Education</H>
           <div className="space-y-1.5">
             {cv.education.map((ed) => (
               <div key={ed.id} className="break-inside-avoid">
@@ -115,21 +118,21 @@ export default function Classic({ cv, settings }: TemplateProps) {
 
       {cv.achievements.length > 0 && (
         <>
-          <H>Achievements</H>
+          <H accent={accent}>Achievements</H>
           <Bullets text={cv.achievements.map((a) => a.text).join("\n")} />
         </>
       )}
 
       {cv.certifications.length > 0 && (
         <>
-          <H>Certifications</H>
+          <H accent={accent}>Certifications</H>
           <Bullets text={cv.certifications.map((a) => a.text).join("\n")} />
         </>
       )}
 
       {cv.languages && (
         <>
-          <H>Languages</H>
+          <H accent={accent}>Languages</H>
           <p>{cv.languages}</p>
         </>
       )}

@@ -2,18 +2,18 @@ import type { TemplateProps } from "@/lib/types";
 import { commaList, fmtRange, href, stripProtocol } from "@/lib/utils";
 import { Bullets, contactItems, Ext } from "./shared";
 
-// সময়রেখা: বাম পাশে তারিখ, মাঝে রঙিন রেখা ও বিন্দু
-export default function Timeline({ cv, settings }: TemplateProps) {
-  const { accent, showPhoto } = settings;
-  const p = cv.personal;
-  const H = ({ children }: { children: React.ReactNode }) => (
+function H({ children, accent }: { children: React.ReactNode; accent: string }) {
+  return (
     <h2 className="mb-2 mt-5 flex break-after-avoid items-center gap-3 text-[10.5pt] font-bold uppercase tracking-[0.14em] text-neutral-900">
       <span className="h-2.5 w-2.5 rotate-45" style={{ background: accent }} />
       {children}
       <span className="h-px flex-1 bg-neutral-200" />
     </h2>
   );
-  const Item = ({ when, children }: { when: string; children: React.ReactNode }) => (
+}
+
+function Item({ when, children, accent }: { when: string; children: React.ReactNode; accent: string }) {
+  return (
     <div className="grid break-inside-avoid grid-cols-[26mm_1fr] gap-4">
       <p className="pt-[1px] text-right text-[8.4pt] font-medium leading-tight text-neutral-500">{when}</p>
       <div className="relative border-l-2 pb-3 pl-4" style={{ borderColor: `${accent}55` }}>
@@ -22,6 +22,12 @@ export default function Timeline({ cv, settings }: TemplateProps) {
       </div>
     </div>
   );
+}
+
+// সময়রেখা: বাম পাশে তারিখ, মাঝে রঙিন রেখা ও বিন্দু
+export default function Timeline({ cv, settings }: TemplateProps) {
+  const { accent, showPhoto } = settings;
+  const p = cv.personal;
   return (
     <div className="text-[9.3pt] leading-[1.45] text-neutral-700">
       <header className="flex items-center gap-5 rounded-xl px-5 py-4" style={{ background: `${accent}12` }}>
@@ -42,7 +48,7 @@ export default function Timeline({ cv, settings }: TemplateProps) {
 
       {cv.skills.length > 0 && (
         <>
-          <H>Skills</H>
+          <H accent={accent}>Skills</H>
           <div className="grid grid-cols-2 gap-x-6 gap-y-1.5">
             {cv.skills.map((s) => (
               <p key={s.id}><b className="text-neutral-900">{s.name}</b><br /><span className="text-neutral-600">{commaList(s.items).join(" · ")}</span></p>
@@ -53,9 +59,9 @@ export default function Timeline({ cv, settings }: TemplateProps) {
 
       {cv.experience.length > 0 && (
         <>
-          <H>Experience</H>
+          <H accent={accent}>Experience</H>
           {cv.experience.map((e) => (
-            <Item key={e.id} when={fmtRange(e.start, e.end, e.current)}>
+            <Item accent={accent} key={e.id} when={fmtRange(e.start, e.end, e.current)}>
               <p className="font-bold text-neutral-900">{e.role}</p>
               <p className="text-neutral-500">{e.company}{e.location && ` · ${e.location}`}</p>
               <Bullets text={e.bullets} className="mt-1" />
@@ -66,7 +72,7 @@ export default function Timeline({ cv, settings }: TemplateProps) {
 
       {cv.projects.length > 0 && (
         <>
-          <H>Projects</H>
+          <H accent={accent}>Projects</H>
           <div className="grid grid-cols-2 gap-3">
             {cv.projects.map((pr) => (
               <div key={pr.id} className="break-inside-avoid rounded-lg border border-neutral-200 p-2.5">
@@ -88,9 +94,9 @@ export default function Timeline({ cv, settings }: TemplateProps) {
 
       {cv.education.length > 0 && (
         <>
-          <H>Education</H>
+          <H accent={accent}>Education</H>
           {cv.education.map((ed) => (
-            <Item key={ed.id} when={fmtRange(ed.start, ed.end)}>
+            <Item accent={accent} key={ed.id} when={fmtRange(ed.start, ed.end)}>
               <p className="font-bold text-neutral-900">{ed.degree}</p>
               <p className="text-neutral-500">{ed.institution}{ed.result && ` · ${ed.result}`}</p>
             </Item>
@@ -100,11 +106,11 @@ export default function Timeline({ cv, settings }: TemplateProps) {
 
       {(cv.achievements.length > 0 || cv.certifications.length > 0) && (
         <>
-          <H>Achievements</H>
+          <H accent={accent}>Achievements</H>
           <Bullets text={[...cv.achievements, ...cv.certifications].map((a) => a.text).join("\n")} />
         </>
       )}
-      {cv.languages && (<><H>Languages</H><p>{cv.languages}</p></>)}
+      {cv.languages && (<><H accent={accent}>Languages</H><p>{cv.languages}</p></>)}
     </div>
   );
 }
