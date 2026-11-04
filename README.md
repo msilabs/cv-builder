@@ -30,7 +30,7 @@ npm run dev
 - `src/lib/` — টাইপ, নমুনা ডেটা, localStorage হুক
 
 ## অবদান
-সমস্যা বা নতুন আইডিয়া থাকলে [Issue](https://github.com/msilabs/cv-builder/issues) খুলুন। Pull request স্বাগত।
+সমস্যা বা নতুন আইডিয়া থাকলে [Issue](https://github.com/msilabs/msilabs-cv-builder/issues) খুলুন। Pull request স্বাগত।
 
 ## লাইসেন্স
 [MIT](LICENSE) © msilabs
