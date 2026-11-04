@@ -1,9 +1,10 @@
 "use client";
-import type { CV, Education, Experience, Project, SimpleItem, SkillGroup } from "@/lib/types";
+import type { CV, SectionKey, Education, Experience, Project, SimpleItem, SkillGroup } from "@/lib/types";
 import { uid } from "@/lib/utils";
 import { AddButton, Field, ItemCard, listOps, Section } from "./fields";
 
-export default function Editor({ cv, setCV }: { cv: CV; setCV: (fn: (c: CV) => CV) => void }) {
+export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; setCV: (fn: (c: CV) => CV) => void; hidden: SectionKey[]; toggleSection: (k: SectionKey) => void }) {
+  const vis = (k: SectionKey) => ({ visible: !hidden.includes(k), onToggleVisible: () => toggleSection(k) });
   const set = <K extends keyof CV>(k: K, v: CV[K]) => setCV((c) => ({ ...c, [k]: v }));
   const setP = (k: keyof CV["personal"], v: string) => setCV((c) => ({ ...c, personal: { ...c.personal, [k]: v } }));
   const p = cv.personal;
@@ -48,7 +49,7 @@ export default function Editor({ cv, setCV }: { cv: CV; setCV: (fn: (c: CV) => C
         <p className="text-[11px] text-slate-400">টিপ: বিদেশি/রিমোট চাকরিতে ছবি ছাড়া CV দেওয়াই ভালো। মডার্ন ও মিনিমাল টেমপ্লেটে ছবি দেখানো যায়।</p>
       </Section>
 
-      <Section title="প্রফেশনাল সামারি" icon="📝">
+      <Section {...vis("summary")} title="প্রফেশনাল সামারি" icon="📝">
         <Field
           label="২–৪ লাইনে নিজের পরিচয়" textarea value={cv.summary} onChange={(v) => set("summary", v)}
           placeholder="Backend developer with 2+ years of experience in Node.js..."
@@ -56,7 +57,7 @@ export default function Editor({ cv, setCV }: { cv: CV; setCV: (fn: (c: CV) => C
         />
       </Section>
 
-      <Section title="টেকনিক্যাল স্কিল" icon="🛠️" count={cv.skills.length}>
+      <Section {...vis("skills")} title="টেকনিক্যাল স্কিল" icon="🛠️" count={cv.skills.length}>
         {cv.skills.map((s, i) => (
           <ItemCard key={s.id} title={s.name || "নতুন গ্রুপ"} onRemove={() => sk.remove(s.id)} onUp={i > 0 ? () => sk.move(i, -1) : undefined} onDown={i < cv.skills.length - 1 ? () => sk.move(i, 1) : undefined}>
             <Field label="গ্রুপের নাম" value={s.name} onChange={(v) => sk.update(s.id, { name: v })} placeholder="Frontend" />
@@ -66,7 +67,7 @@ export default function Editor({ cv, setCV }: { cv: CV; setCV: (fn: (c: CV) => C
         <AddButton onClick={() => sk.add({ id: uid(), name: "", items: "" })}>স্কিল গ্রুপ যোগ করুন</AddButton>
       </Section>
 
-      <Section title="কাজের অভিজ্ঞতা" icon="💼" count={cv.experience.length}>
+      <Section {...vis("experience")} title="কাজের অভিজ্ঞতা" icon="💼" count={cv.experience.length}>
         {cv.experience.map((e, i) => (
           <ItemCard key={e.id} title={e.role || e.company || "নতুন অভিজ্ঞতা"} onRemove={() => exp.remove(e.id)} onUp={i > 0 ? () => exp.move(i, -1) : undefined} onDown={i < cv.experience.length - 1 ? () => exp.move(i, 1) : undefined}>
             <Field label="পদবি" value={e.role} onChange={(v) => exp.update(e.id, { role: v })} placeholder="Software Engineer" />
@@ -90,7 +91,7 @@ export default function Editor({ cv, setCV }: { cv: CV; setCV: (fn: (c: CV) => C
         <AddButton onClick={() => exp.add({ id: uid(), company: "", role: "", location: "", start: "", end: "", current: false, bullets: "" })}>অভিজ্ঞতা যোগ করুন</AddButton>
       </Section>
 
-      <Section title="প্রজেক্ট" icon="🚀" count={cv.projects.length}>
+      <Section {...vis("projects")} title="প্রজেক্ট" icon="🚀" count={cv.projects.length}>
         {cv.projects.map((pr, i) => (
           <ItemCard key={pr.id} title={pr.name || "নতুন প্রজেক্ট"} onRemove={() => proj.remove(pr.id)} onUp={i > 0 ? () => proj.move(i, -1) : undefined} onDown={i < cv.projects.length - 1 ? () => proj.move(i, 1) : undefined}>
             <Field label="প্রজেক্টের নাম" value={pr.name} onChange={(v) => proj.update(pr.id, { name: v })} placeholder="E-commerce App" />
@@ -105,7 +106,7 @@ export default function Editor({ cv, setCV }: { cv: CV; setCV: (fn: (c: CV) => C
         <AddButton onClick={() => proj.add({ id: uid(), name: "", tech: "", link: "", repo: "", bullets: "" })}>প্রজেক্ট যোগ করুন</AddButton>
       </Section>
 
-      <Section title="শিক্ষা" icon="🎓" count={cv.education.length}>
+      <Section {...vis("education")} title="শিক্ষা" icon="🎓" count={cv.education.length}>
         {cv.education.map((ed, i) => (
           <ItemCard key={ed.id} title={ed.degree || "নতুন ডিগ্রি"} onRemove={() => edu.remove(ed.id)} onUp={i > 0 ? () => edu.move(i, -1) : undefined} onDown={i < cv.education.length - 1 ? () => edu.move(i, 1) : undefined}>
             <Field label="ডিগ্রি" value={ed.degree} onChange={(v) => edu.update(ed.id, { degree: v })} placeholder="B.Sc. in CSE / HSC / SSC" />
@@ -120,20 +121,20 @@ export default function Editor({ cv, setCV }: { cv: CV; setCV: (fn: (c: CV) => C
         <AddButton onClick={() => edu.add({ id: uid(), degree: "", institution: "", result: "", start: "", end: "" })}>শিক্ষাগত যোগ্যতা যোগ করুন</AddButton>
       </Section>
 
-      <SimpleList title="অর্জন (ICPC, Codeforces, হ্যাকাথন)" icon="🏆" items={cv.achievements} onChange={(l) => set("achievements", l)} placeholder="ICPC Dhaka Regional 2023 – Ranked 45th" />
-      <SimpleList title="সার্টিফিকেশন" icon="📜" items={cv.certifications} onChange={(l) => set("certifications", l)} placeholder="AWS Certified Developer – Associate" />
+      <SimpleList {...vis("achievements")} title="অর্জন (ICPC, Codeforces, হ্যাকাথন)" icon="🏆" items={cv.achievements} onChange={(l) => set("achievements", l)} placeholder="ICPC Dhaka Regional 2023 – Ranked 45th" />
+      <SimpleList {...vis("certifications")} title="সার্টিফিকেশন" icon="📜" items={cv.certifications} onChange={(l) => set("certifications", l)} placeholder="AWS Certified Developer – Associate" />
 
-      <Section title="ভাষা" icon="🌐">
+      <Section {...vis("languages")} title="ভাষা" icon="🌐">
         <Field label="ভাষা" value={cv.languages} onChange={(v) => set("languages", v)} placeholder="Bangla (Native), English (Professional)" />
       </Section>
     </div>
   );
 }
 
-function SimpleList({ title, icon, items, onChange, placeholder }: { title: string; icon: string; items: SimpleItem[]; onChange: (l: SimpleItem[]) => void; placeholder: string }) {
+function SimpleList({ title, icon, items, onChange, placeholder, visible, onToggleVisible }: { title: string; icon: string; items: SimpleItem[]; onChange: (l: SimpleItem[]) => void; placeholder: string; visible: boolean; onToggleVisible: () => void }) {
   const ops = listOps(items, onChange);
   return (
-    <Section title={title} icon={icon} count={items.length}>
+    <Section title={title} icon={icon} count={items.length} visible={visible} onToggleVisible={onToggleVisible}>
       {items.map((a, i) => (
         <div key={a.id} className="flex gap-2">
           <input className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-teal-600" value={a.text} placeholder={placeholder} onChange={(e) => ops.update(a.id, { text: e.target.value })} />

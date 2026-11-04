@@ -62,12 +62,15 @@ export interface CV {
   languages: string;
 }
 
+export type SectionKey = "summary" | "skills" | "experience" | "projects" | "education" | "achievements" | "certifications" | "languages";
+
 export type TemplateId = "classic" | "modern" | "minimal";
 
 export interface Settings {
   template: TemplateId;
   accent: string;
   showPhoto: boolean;
+  hidden: SectionKey[]; // CV থেকে লুকানো সেকশন
 }
 
 export interface TemplateProps {

@@ -23,17 +23,33 @@ export function Field({
   );
 }
 
-export function Section({ title, icon, children, defaultOpen = false, count }: { title: string; icon: string; children: React.ReactNode; defaultOpen?: boolean; count?: number }) {
-  const [open, setOpen] = useState(defaultOpen);
+export function Toggle({ on, onChange, label }: { on: boolean; onChange: () => void; label: string }) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white shadow-sm">
-      <button type="button" onClick={() => setOpen(!open)} className="flex w-full items-center justify-between px-4 py-3 text-left">
-        <span className="flex items-center gap-2 font-semibold text-slate-800">
-          <span aria-hidden>{icon}</span> {title}
-          {count !== undefined && count > 0 && <span className="rounded-full bg-teal-50 px-2 text-xs font-medium text-teal-700">{count}</span>}
-        </span>
-        <span className={`text-slate-400 transition ${open ? "rotate-180" : ""}`}>▾</span>
-      </button>
+    <button type="button" role="switch" aria-checked={on} aria-label={label} title={on ? "CV-তে দেখাচ্ছে, লুকাতে চাপুন" : "লুকানো আছে, দেখাতে চাপুন"} onClick={onChange}
+      className={`relative h-5 w-9 shrink-0 rounded-full transition ${on ? "bg-teal-600" : "bg-slate-300"}`}>
+      <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all ${on ? "left-[18px]" : "left-0.5"}`} />
+    </button>
+  );
+}
+
+export function Section({ title, icon, children, defaultOpen = false, count, visible, onToggleVisible }: {
+  title: string; icon: string; children: React.ReactNode; defaultOpen?: boolean; count?: number; visible?: boolean; onToggleVisible?: () => void;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  const hidden = visible === false;
+  return (
+    <section className={`rounded-xl border bg-white shadow-sm ${hidden ? "border-dashed border-slate-300" : "border-slate-200"}`}>
+      <div className="flex items-center gap-3 pr-4">
+        <button type="button" onClick={() => setOpen(!open)} className="flex min-w-0 flex-1 items-center justify-between px-4 py-3 text-left">
+          <span className={`flex items-center gap-2 font-semibold ${hidden ? "text-slate-400" : "text-slate-800"}`}>
+            <span aria-hidden className={hidden ? "opacity-40" : ""}>{icon}</span> {title}
+            {count !== undefined && count > 0 && <span className="rounded-full bg-teal-50 px-2 text-xs font-medium text-teal-700">{count}</span>}
+            {hidden && <span className="rounded bg-slate-100 px-1.5 text-[11px] font-normal text-slate-500">লুকানো</span>}
+          </span>
+          <span className={`text-slate-400 transition ${open ? "rotate-180" : ""}`}>▾</span>
+        </button>
+        {onToggleVisible && <Toggle on={!hidden} onChange={onToggleVisible} label={`${title} দেখাও/লুকাও`} />}
+      </div>
       {open && <div className="space-y-3 border-t border-slate-100 px-4 py-4">{children}</div>}
     </section>
   );

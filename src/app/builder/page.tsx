@@ -4,8 +4,8 @@ import { useRef, useState } from "react";
 import Editor from "@/components/editor/Editor";
 import Preview from "@/components/Preview";
 import { templates } from "@/components/templates";
-import { emptyCV, findSampleLeftovers, sampleCV } from "@/lib/sample";
-import type { TemplateId } from "@/lib/types";
+import { emptyCV, findSampleLeftovers, sampleCV, visibleCV } from "@/lib/sample";
+import type { SectionKey, TemplateId } from "@/lib/types";
 import { useCV } from "@/lib/useCV";
 
 const ACCENTS = ["#0f766e", "#1d4ed8", "#7c3aed", "#be123c", "#c2410c", "#334155", "#006a4e"];
@@ -15,7 +15,10 @@ export default function BuilderPage() {
   const [tab, setTab] = useState<"edit" | "preview">("edit");
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const leftovers = findSampleLeftovers(cv);
+  const shownCV = visibleCV(cv, settings.hidden);
+  const leftovers = findSampleLeftovers(shownCV);
+  const toggleSection = (k: SectionKey) =>
+    setSettings((s) => ({ ...s, hidden: s.hidden.includes(k) ? s.hidden.filter((x) => x !== k) : [...s.hidden, k] }));
   const isEmpty = !cv.personal.fullName && !cv.summary && cv.experience.length === 0 && cv.projects.length === 0 && cv.skills.length === 0;
 
   const downloadPDF = () => {
@@ -116,12 +119,12 @@ export default function BuilderPage() {
               <button className="mt-2 text-xs font-semibold text-teal-700 underline" onClick={() => setCV(sampleCV)}>একটা নমুনা CV দেখতে চাই</button>
             </div>
           )}
-          {loaded && <Editor cv={cv} setCV={(fn) => setCV(fn)} />}
+          {loaded && <Editor cv={cv} setCV={(fn) => setCV(fn)} hidden={settings.hidden} toggleSection={toggleSection} />}
           <p className="pb-6 text-center text-[11px] text-slate-400">🔒 আপনার ডেটা শুধু আপনার ব্রাউজারেই সেভ থাকে, কোনো সার্ভারে যায় না।</p>
         </aside>
 
         <main className={`overflow-y-auto p-4 lg:h-[calc(100vh-53px)] print:block print:h-auto print:overflow-visible print:p-0 ${tab === "preview" ? "" : "hidden lg:block"}`}>
-          {loaded && <Preview cv={cv} settings={settings} />}
+          {loaded && <Preview cv={shownCV} settings={settings} />}
         </main>
       </div>
     </div>

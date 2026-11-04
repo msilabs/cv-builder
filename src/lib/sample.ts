@@ -1,4 +1,4 @@
-import type { CV, Settings } from "./types";
+import type { CV, SectionKey, Settings } from "./types";
 
 export const emptyCV: CV = {
   personal: { fullName: "", title: "", email: "", phone: "", location: "", github: "", linkedin: "", website: "", photo: "" },
@@ -12,7 +12,7 @@ export const emptyCV: CV = {
   languages: "",
 };
 
-export const defaultSettings: Settings = { template: "classic", accent: "#0f766e", showPhoto: false };
+export const defaultSettings: Settings = { template: "classic", accent: "#0f766e", showPhoto: false, hidden: [] };
 
 export const sampleCV: CV = {
   personal: {
@@ -134,4 +134,15 @@ export function findSampleLeftovers(cv: CV): string[] {
   for (const a of cv.achievements) if (has(s.achievements.map((x) => x.text), a.text)) found.add("অর্জন");
   for (const c of cv.certifications) if (has(s.certifications.map((x) => x.text), c.text)) found.add("সার্টিফিকেশন");
   return [...found];
+}
+
+// লুকানো সেকশন খালি করে দেয়, যাতে প্রিভিউ/PDF-এ না আসে (আসল ডেটা অক্ষত থাকে)
+export function visibleCV(cv: CV, hidden: SectionKey[]): CV {
+  if (!hidden.length) return cv;
+  const out = { ...cv };
+  for (const k of hidden) {
+    if (k === "summary" || k === "languages") out[k] = "";
+    else out[k] = [];
+  }
+  return out;
 }
