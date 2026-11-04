@@ -3,6 +3,16 @@ import type { CV, PortfolioSettings, PortfolioTheme, SectionKey } from "./types"
 import { BASE_CSS, THEMES } from "./portfolio-css";
 import { commaList, fmtRange, href, lines, stripProtocol } from "./utils";
 
+// ছোট SVG আইকন (lucide থেকে), ইমোজির বদলে: সব ডিভাইসে একই রকম দেখায়
+const svg = (d: string) =>
+  `<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ICON = {
+  mail: svg('<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>'),
+  pin: svg('<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>'),
+  phone: svg('<path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/>'),
+  star: svg('<path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>'),
+};
+
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 
@@ -89,7 +99,7 @@ export function generatePortfolio(cv: CV, ps: PortfolioSettings): string {
 
   // হিরো
   const heroLinks = [
-    email && `<a class="btn primary" href="mailto:${esc(email)}">✉ Get in touch</a>`,
+    email && `<a class="btn primary" href="mailto:${esc(email)}">${ICON.mail} Get in touch</a>`,
     ...social.slice(0, 3).map((s) => ext(s.url, `${esc(s.label)} ↗`, "btn")),
   ]
     .filter(Boolean)
@@ -99,7 +109,7 @@ export function generatePortfolio(cv: CV, ps: PortfolioSettings): string {
 <h1>${esc(name)}</h1>
 ${p.title ? `<p class="role">${esc(p.title)}</p>` : ""}
 ${p.tagline ? `<p class="tagline">${esc(p.tagline)}</p>` : ""}
-${location || cv.openToWork ? `<p class="meta">${location ? `<span>📍 ${esc(location)}</span>` : ""}${cv.openToWork ? `<span class="badge">Open to work</span>` : ""}</p>` : ""}
+${location || cv.openToWork ? `<p class="meta">${location ? `<span>${ICON.pin} ${esc(location)}</span>` : ""}${cv.openToWork ? `<span class="badge">Open to work</span>` : ""}</p>` : ""}
 ${heroLinks ? `<div class="cta">${heroLinks}</div>` : ""}
 </div>${photo ? `<img class="avatar" src="${photo}" alt="${esc(name)}">` : ""}</section>`);
 
@@ -133,7 +143,7 @@ ${heroLinks ? `<div class="cta">${heroLinks}</div>` : ""}
     const cards = projects
       .map((x) => {
         const links = [ext(x.link, "Live ↗"), ext(x.repo, "Code ↗")].filter(Boolean).join("");
-        return `<article class="project">${x.featured ? `<span class="tag">★ Featured</span>` : ""}<h3>${esc(x.name)}</h3>${x.tech ? `<p class="tech">${esc(x.tech)}</p>` : ""}${bulletList(x.bullets)}${links ? `<p class="links">${links}</p>` : ""}</article>`;
+        return `<article class="project">${x.featured ? `<span class="tag">${ICON.star} Featured</span>` : ""}<h3>${esc(x.name)}</h3>${x.tech ? `<p class="tech">${esc(x.tech)}</p>` : ""}${bulletList(x.bullets)}${links ? `<p class="links">${links}</p>` : ""}</article>`;
       })
       .join("");
     S.push(`<section id="projects"><h2>Projects</h2><div class="projects">${cards}</div></section>`);
@@ -152,10 +162,10 @@ ${heroLinks ? `<div class="cta">${heroLinks}</div>` : ""}
   }
 
   // যোগাযোগ
-  const contactBtns = [email && `<a class="btn primary" href="mailto:${esc(email)}">✉ ${esc(email)}</a>`, ...social.map((s) => ext(s.url, `${esc(s.label)} ↗`, "btn"))]
+  const contactBtns = [email && `<a class="btn primary" href="mailto:${esc(email)}">${ICON.mail} ${esc(email)}</a>`, ...social.map((s) => ext(s.url, `${esc(s.label)} ↗`, "btn"))]
     .filter(Boolean)
     .join("");
-  const info = [phone && `📞 <a href="tel:${esc(phone.replace(/[^\d+]/g, ""))}">${esc(phone)}</a>`, location && `📍 ${esc(location)}`].filter(Boolean).join(" &nbsp;·&nbsp; ");
+  const info = [phone && `${ICON.phone} <a href="tel:${esc(phone.replace(/[^\d+]/g, ""))}">${esc(phone)}</a>`, location && `${ICON.pin} ${esc(location)}`].filter(Boolean).join(" &nbsp;·&nbsp; ");
   if (contactBtns || info) {
     nav.push(`<a href="#contact">Contact</a>`);
     S.push(`<section id="contact" class="contact"><h2>Let's build something together</h2><p class="muted" style="margin:0">${cv.openToWork ? "I'm currently open to new opportunities." : "Have a project or idea? I'd love to hear about it."}</p><div class="cta">${contactBtns}</div>${info ? `<p class="info">${info}</p>` : ""}</section>`);

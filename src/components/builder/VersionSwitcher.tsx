@@ -1,4 +1,5 @@
 "use client";
+import { Check, Copy, Layers, Pencil, Plus, Trash2 } from "@/components/ui/icons";
 import { useDialogs } from "@/components/ui/Dialogs";
 import { useLang } from "@/i18n/lang";
 import { Menu, MenuDivider, MenuItem } from "@/components/toolbar/Menu";
@@ -25,7 +26,7 @@ export function VersionSwitcher() {
   return (
     <Menu align="left"
       buttonClass={`${btnOutline} max-w-[8.5rem] !justify-start px-2.5 sm:max-w-[16rem]`}
-      label={<><span aria-hidden>🗂</span><span className="truncate">{profile.name}</span></>}>
+      label={<><Layers className="h-4 w-4 shrink-0 text-slate-500" aria-hidden /><span className="truncate">{profile.name}</span></>}>
       {(close) => (
         <div className="w-72">
           <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">{L.heading(data.profiles.length)}</p>
@@ -33,7 +34,7 @@ export function VersionSwitcher() {
             {data.profiles.map((p) => (
               <button key={p.id} type="button" onClick={() => { switchProfile(p.id); close(); }}
                 className={`flex w-full items-start gap-2 rounded-md px-3 py-2 text-left text-sm hover:bg-slate-100 ${p.id === profile.id ? "bg-teal-50" : ""}`}>
-                <span className="mt-0.5 w-4 text-teal-700">{p.id === profile.id ? "✓" : ""}</span>
+                <span className="mt-0.5 w-4 text-teal-700">{p.id === profile.id && <Check className="h-4 w-4" aria-hidden />}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-medium text-slate-800">{p.name}</span>
                   <span className="block text-[11px] text-slate-500">{p.cv.personal.fullName || L.noName} · {ago(p.updatedAt, t.b.ago)}</span>
@@ -42,22 +43,22 @@ export function VersionSwitcher() {
             ))}
           </div>
           <MenuDivider />
-          <MenuItem hint={L.duplicateHint} onClick={async () => {
+          <MenuItem hint={L.duplicateHint} icon={Copy} onClick={async () => {
             close();
             const n = await askName(L.duplicatePrompt, `${profile.name}${L.copySuffix}`);
             if (n) { duplicateProfile(profile.id, n); toast(t.b.toast.versionCreated(n)); }
           }}>{L.duplicate}</MenuItem>
-          <MenuItem onClick={async () => {
+          <MenuItem icon={Plus} onClick={async () => {
             close();
             const n = await askName(L.addPrompt, L.addDefault);
             if (n) { addProfile(n); toast(t.b.toast.versionCreated(n)); }
           }}>{L.add}</MenuItem>
-          <MenuItem onClick={async () => {
+          <MenuItem icon={Pencil} onClick={async () => {
             close();
             const n = await askName(L.renamePrompt, profile.name);
             if (n) { renameProfile(profile.id, n); toast(t.b.toast.renamed); }
           }}>{L.rename}</MenuItem>
-          <MenuItem danger onClick={async () => {
+          <MenuItem danger icon={Trash2} onClick={async () => {
             close();
             if (await confirm({ message: L.confirmRemove(profile.name), confirmLabel: t.b.dialogs.delete, danger: true })) {
               deleteProfile(profile.id);

@@ -1,4 +1,5 @@
 "use client";
+import { Check, Copy, Download, ExternalLink } from "@/components/ui/icons";
 // টুলবারের ডান দিকের প্রধান কাজ: PDF, README কপি, পোর্টফোলিও ডাউনলোড
 import { useReadmeActions } from "@/components/readme/ReadmePanels";
 import { useDialogs } from "@/components/ui/Dialogs";
@@ -46,20 +47,20 @@ export function ExportActions({ view, markdown, portfolioHtml, leftovers, fullNa
   if (view === "readme")
     return (
       <>
-        <button type="button" className={secondary} onClick={readme.download}>{B.actions.md}</button>
-        <button type="button" className={btnPrimary} onClick={readme.copy}>{readme.copied ? B.actions.copied : B.actions.copyReadme}</button>
+        <button type="button" className={secondary} onClick={readme.download}><Download className="h-4 w-4" aria-hidden />{B.actions.md}</button>
+        <button type="button" className={btnPrimary} onClick={readme.copy}>{readme.copied ? <Check className="h-4 w-4" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}{readme.copied ? B.actions.copied : B.actions.copyReadme}</button>
       </>
     );
   if (view === "portfolio")
     return (
       <>
-        <button type="button" className={secondary} onClick={openPortfolio}>{B.actions.openTab}</button>
-        <button type="button" className={btnPrimary} onClick={downloadPortfolio}>{B.actions.html}</button>
+        <button type="button" className={secondary} onClick={openPortfolio}><ExternalLink className="h-4 w-4" aria-hidden />{B.actions.openTab}</button>
+        <button type="button" className={btnPrimary} onClick={downloadPortfolio}><Download className="h-4 w-4" aria-hidden />{B.actions.html}</button>
       </>
     );
   return (
     <button type="button" className={btnPrimary} onClick={downloadPDF}>
-      ⬇ {B.actions.pdf}<span className="hidden xl:inline">{B.actions.download}</span>
+      <Download className="h-4 w-4" aria-hidden />{B.actions.pdf}<span className="hidden xl:inline">{B.actions.download}</span>
     </button>
   );
 }

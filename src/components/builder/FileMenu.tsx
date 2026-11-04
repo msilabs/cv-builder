@@ -1,4 +1,5 @@
 "use client";
+import { FlaskConical, FolderOpen, Save, Trash2 } from "@/components/ui/icons";
 import { useDialogs } from "@/components/ui/Dialogs";
 import { useLang } from "@/i18n/lang";
 import { useRef } from "react";
@@ -37,20 +38,20 @@ export function FileMenu({ isEmpty, onImport }: { isEmpty: boolean; onImport: (r
 
   return (
     <>
-      <Menu label={<>📁 <span className="hidden lg:inline">{L.menu}</span></>} badge={warn}>
+      <Menu ariaLabel={L.menu} label={<><FolderOpen className="h-4 w-4" aria-hidden /> <span className="hidden lg:inline">{L.menu}</span></>} badge={warn}>
         {(close) => (
           <>
-            <MenuItem onClick={() => { exportProfile(profile); markBackup(); close(); toast(t.b.toast.backup); }} hint={L.lastBackup(last)}>
+            <MenuItem onClick={() => { exportProfile(profile); markBackup(); close(); toast(t.b.toast.backup); }} hint={L.lastBackup(last)} icon={Save}>
               {L.save}
             </MenuItem>
-            <MenuItem onClick={() => { fileRef.current?.click(); close(); }} hint={L.importHint}>
+            <MenuItem onClick={() => { fileRef.current?.click(); close(); }} hint={L.importHint} icon={FolderOpen}>
               {L.import}
             </MenuItem>
             <MenuDivider />
-            <MenuItem onClick={async () => { close(); if (isEmpty || (await confirm({ message: L.confirmSample, confirmLabel: t.b.dialogs.load }))) setCV(sampleCV); }}>
+            <MenuItem icon={FlaskConical} onClick={async () => { close(); if (isEmpty || (await confirm({ message: L.confirmSample, confirmLabel: t.b.dialogs.load }))) setCV(sampleCV); }}>
               {L.sample}
             </MenuItem>
-            <MenuItem danger onClick={async () => { close(); if (await confirm({ message: L.confirmClear, confirmLabel: t.b.dialogs.clear, danger: true })) setCV(emptyCV); }}>
+            <MenuItem danger icon={Trash2} onClick={async () => { close(); if (await confirm({ message: L.confirmClear, confirmLabel: t.b.dialogs.clear, danger: true })) setCV(emptyCV); }}>
               {L.clear}
             </MenuItem>
             {warn && (

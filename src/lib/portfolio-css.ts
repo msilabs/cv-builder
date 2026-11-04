@@ -5,6 +5,10 @@ export const BASE_CSS = `
 *{box-sizing:border-box}html{scroll-behavior:smooth}
 body{margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Bengali",sans-serif;background:var(--bg);color:var(--fg);line-height:1.6;-webkit-font-smoothing:antialiased}
 a{color:inherit}
+.i{width:1em;height:1em;flex-shrink:0;vertical-align:-.125em;display:inline-block}
+.meta span{display:inline-flex;align-items:center;gap:6px}
+.project .tag{display:inline-flex;align-items:center;gap:4px}
+.project .tag .i{color:#f59e0b}
 .wrap{max-width:960px;margin:0 auto;padding:0 20px}
 .nav{position:sticky;top:0;z-index:10;backdrop-filter:blur(10px);background:color-mix(in srgb,var(--bg) 82%,transparent);border-bottom:1px solid var(--line)}
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}

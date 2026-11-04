@@ -1,4 +1,5 @@
 "use client";
+import { X } from "./icons";
 import { useEffect, useId, useRef } from "react";
 import { useLang } from "@/i18n/lang";
 
@@ -59,7 +60,7 @@ export function Modal({ open, onClose, title, children, wide }: { open: boolean;
       <div ref={box} role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1} className={`my-8 w-full rounded-2xl bg-white shadow-2xl outline-none ${wide ? "max-w-3xl" : "max-w-md"}`}>
         <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3">
           <h2 id={titleId} className="font-semibold text-slate-900">{title}</h2>
-          <button type="button" onClick={onClose} aria-label={t.b.actions.close} className="rounded-md px-2 py-1 text-slate-500 hover:bg-slate-100 hover:text-slate-800">✕</button>
+          <button type="button" onClick={onClose} aria-label={t.b.actions.close} className="rounded-md px-2 py-1 text-slate-500 hover:bg-slate-100 hover:text-slate-800"><X className="h-4 w-4" aria-hidden /></button>
         </div>
         <div className="p-5">{children}</div>
       </div>

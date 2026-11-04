@@ -6,12 +6,12 @@ import { commaList, lines } from "./utils";
 export type AITask = "fromText" | "improve" | "tailor" | "summary" | "coverLetter";
 
 // কাজের নাম ও বিবরণ অভিধানে (t.b.ai.tasks)
-export const AI_TASKS: Record<AITask, { icon: string; needs?: "oldCv" | "jd"; returnsJson: boolean; asNewVersion: boolean }> = {
-  fromText: { icon: "📥", needs: "oldCv", returnsJson: true, asNewVersion: false },
-  improve: { icon: "✨", returnsJson: true, asNewVersion: false },
-  tailor: { icon: "🎯", needs: "jd", returnsJson: true, asNewVersion: true },
-  summary: { icon: "📝", returnsJson: true, asNewVersion: false },
-  coverLetter: { icon: "✉️", needs: "jd", returnsJson: false, asNewVersion: false },
+export const AI_TASKS: Record<AITask, { needs?: "oldCv" | "jd"; returnsJson: boolean; asNewVersion: boolean }> = {
+  fromText: { needs: "oldCv", returnsJson: true, asNewVersion: false },
+  improve: { returnsJson: true, asNewVersion: false },
+  tailor: { needs: "jd", returnsJson: true, asNewVersion: true },
+  summary: { returnsJson: true, asNewVersion: false },
+  coverLetter: { needs: "jd", returnsJson: false, asNewVersion: false },
 };
 
 // AI-কে যা পাঠানো হবে: id, ছবি, ফোন, ইমেইল বাদ; লাইনগুলো অ্যারে করে (AI-এর জন্য সহজ)

@@ -1,4 +1,5 @@
 "use client";
+import { ArrowRight } from "@/components/ui/icons";
 import { useLang } from "@/i18n/lang";
 import { cvProgress, openSection, SECTION_OF } from "@/lib/progress";
 import type { CV } from "@/lib/types";
@@ -25,7 +26,7 @@ export function ProgressCard({ cv }: { cv: CV }) {
           {missing.slice(0, 3).map((k) => (
             <button key={k} type="button" onClick={() => openSection(SECTION_OF[k])}
               className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-slate-700 transition hover:border-teal-400 hover:bg-teal-50 hover:text-teal-800">
-              {L.items[k]} →
+              {L.items[k]} <ArrowRight className="inline h-3 w-3" aria-hidden />
             </button>
           ))}
         </div>

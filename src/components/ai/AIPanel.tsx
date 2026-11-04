@@ -1,4 +1,5 @@
 "use client";
+import { ArrowLeft, Check, Copy, ExternalLink, FileUp, Lock, Mail, PenLine, Target, TriangleAlert, WandSparkles } from "@/components/ui/icons";
 import { useLang } from "@/i18n/lang";
 import { useMemo, useState } from "react";
 import { Modal } from "@/components/ui/Modal";
@@ -8,6 +9,10 @@ import { extractJSON } from "@/lib/normalize";
 import { isEmptyCV } from "@/lib/sample";
 import { useStore } from "@/lib/store";
 import type { CV } from "@/lib/types";
+
+const TASK_ICONS: Record<AITask, React.ComponentType<{ className?: string }>> = {
+  fromText: FileUp, improve: WandSparkles, tailor: Target, summary: PenLine, coverLetter: Mail,
+};
 
 const Step = ({ n, title, children }: { n: number; title: string; children: React.ReactNode }) => (
   <div className="flex gap-3">
@@ -99,20 +104,20 @@ export function AIPanel({ open, onClose, onApplied, initialTask }: { open: boole
             {(Object.keys(AI_TASKS) as AITask[]).map((t) => (
               <button key={t} type="button" onClick={() => choose(t)}
                 className="rounded-xl border border-slate-200 p-3 text-left transition hover:border-teal-500 hover:bg-teal-50/50">
-                <span className="text-lg" aria-hidden>{AI_TASKS[t].icon}</span>
+                {(() => { const TaskIcon = TASK_ICONS[t]; return <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-50 text-violet-700" aria-hidden><TaskIcon className="h-4 w-4" /></span>; })()}
                 <span className="mt-1 block font-semibold text-slate-800">{L.tasks[t].title}</span>
                 <span className="mt-0.5 block text-xs text-slate-500">{L.tasks[t].desc}</span>
               </button>
             ))}
           </div>
           <p className="rounded-lg bg-slate-50 p-3 text-xs leading-relaxed text-slate-500">
-            {L.privacy}
+            <span className="flex gap-2"><Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />{L.privacy}</span>
           </p>
         </div>
       ) : (
         <div className="space-y-5">
-          <button type="button" onClick={reset} className="text-sm text-teal-700 hover:underline">{L.back}</button>
-          <p className="text-base font-semibold text-slate-900">{meta!.icon} {L.tasks[task].title}</p>
+          <button type="button" onClick={reset} className="inline-flex items-center gap-1 text-sm text-teal-700 hover:underline"><ArrowLeft className="h-4 w-4" aria-hidden />{L.back}</button>
+          <p className="flex items-center gap-2 text-base font-semibold text-slate-900">{(() => { const TaskIcon = TASK_ICONS[task]; return <TaskIcon className="h-5 w-5 text-violet-700" aria-hidden />; })()}{L.tasks[task].title}</p>
 
           {meta!.needs && (
             <Step n={1} title={meta!.needs === "jd" ? L.stepJd : L.stepOldCv}>
@@ -124,11 +129,12 @@ export function AIPanel({ open, onClose, onApplied, initialTask }: { open: boole
           <Step n={meta!.needs ? 2 : 1} title={L.stepCopy}>
             <div className="flex flex-wrap items-center gap-2">
               <button type="button" onClick={copyPrompt} disabled={!!meta!.needs && !extra.trim()}
-                className="rounded-md bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-40">
+                className="inline-flex items-center gap-1.5 rounded-md bg-teal-700 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-40">
+                {copied ? <Check className="h-4 w-4" aria-hidden /> : <Copy className="h-4 w-4" aria-hidden />}
                 {copied ? L.copied : L.copy}
               </button>
               {AI_LINKS.map((l) => (
-                <a key={l.name} href={l.url} target="_blank" rel="noreferrer" className="rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">{l.name} ↗</a>
+                <a key={l.name} href={l.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">{l.name}<ExternalLink className="h-3.5 w-3.5" aria-hidden /></a>
               ))}
             </div>
             {meta!.needs && !extra.trim() && <p className="mt-1.5 text-xs text-amber-700">{L.needInput}</p>}
@@ -155,7 +161,7 @@ export function AIPanel({ open, onClose, onApplied, initialTask }: { open: boole
                   </div>
                   {parsed.diff.newNumbers.length > 0 && (
                     <div className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
-                      <p className="font-semibold">{L.numbersTitle}</p>
+                      <p className="flex items-center gap-1.5 font-semibold"><TriangleAlert className="h-4 w-4" aria-hidden />{L.numbersTitle}</p>
                       <p className="mt-1">{parsed.diff.newNumbers.map((n) => <code key={n} className="mr-1.5 rounded bg-white px-1.5 py-0.5">{n}</code>)}</p>
                       <p className="mt-1 text-xs">{L.numbersHint}</p>
                     </div>
@@ -178,7 +184,7 @@ export function AIPanel({ open, onClose, onApplied, initialTask }: { open: boole
                   </div>
                   <button type="button" onClick={apply} disabled={!parsed.diff.changes.length}
                     className="w-full rounded-md bg-teal-700 py-2.5 text-sm font-semibold text-white hover:bg-teal-800 disabled:opacity-40">
-                    {L.apply}
+                    <span className="inline-flex items-center gap-1.5"><Check className="h-4 w-4" aria-hidden />{L.apply}</span>
                   </button>
                 </div>
               )}

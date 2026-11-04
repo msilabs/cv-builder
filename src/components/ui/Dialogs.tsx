@@ -1,4 +1,5 @@
 "use client";
+import { CircleCheck, Info, TriangleAlert } from "./icons";
 // ব্রাউজারের confirm/prompt/alert-এর বদলে সাইটের ডিজাইনের ডায়ালগ ও টোস্ট
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useLang } from "@/i18n/lang";
@@ -90,7 +91,7 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
             className={`pointer-events-auto flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium shadow-lg ring-1 ${
               x.kind === "error" ? "bg-red-600 text-white ring-red-700" : x.kind === "info" ? "bg-slate-900 text-white ring-slate-800" : "bg-teal-700 text-white ring-teal-800"
             }`}>
-            <span aria-hidden>{x.kind === "error" ? "⚠" : x.kind === "info" ? "ℹ" : "✓"}</span> {x.text}
+            {x.kind === "error" ? <TriangleAlert className="h-4 w-4" aria-hidden /> : x.kind === "info" ? <Info className="h-4 w-4" aria-hidden /> : <CircleCheck className="h-4 w-4" aria-hidden />} {x.text}
           </div>
         ))}
       </div>

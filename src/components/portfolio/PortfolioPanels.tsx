@@ -1,4 +1,5 @@
 "use client";
+import { ExternalLink, Monitor, Smartphone } from "@/components/ui/icons";
 import { useLang } from "@/i18n/lang";
 import { useState } from "react";
 import { AccentPicker } from "@/components/builder/CVSettingsPanel";
@@ -56,7 +57,7 @@ export function PortfolioHowTo({ github }: { github: string }) {
       <ol className="mt-1.5 list-decimal space-y-1 pl-5">
         <li>
           {L.pages1(`${u}.github.io`)}{" "}
-          <a className="text-teal-700 underline" href="https://github.com/new" target="_blank" rel="noreferrer">github.com/new ↗</a>
+          <a href="https://github.com/new" target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 text-teal-700 underline">github.com/new<ExternalLink className="h-3 w-3" aria-hidden /></a>
         </li>
         <li>{L.pages2}</li>
         <li>{L.pages3(`https://${u}.github.io`)}</li>
@@ -73,16 +74,16 @@ export function PortfolioHowTo({ github }: { github: string }) {
 export function PortfolioPreviewPane({ html }: { html: string }) {
   const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
   const { t } = useLang();
-  const btn = (d: typeof device, label: string) => (
+  const btn = (d: typeof device, label: React.ReactNode) => (
     <button type="button" onClick={() => setDevice(d)}
-      className={`rounded-md px-3 py-1 text-sm ${device === d ? "bg-white font-medium text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}>{label}</button>
+      className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-sm ${device === d ? "bg-white font-medium text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}>{label}</button>
   );
   return (
     <div className="mx-auto flex h-full max-w-6xl flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex gap-1 rounded-lg bg-slate-200/70 p-1">
-          {btn("desktop", t.b.portfolio.desktop)}
-          {btn("mobile", t.b.portfolio.mobile)}
+          {btn("desktop", <><Monitor className="h-4 w-4" aria-hidden />{t.b.portfolio.desktop}</>)}
+          {btn("mobile", <><Smartphone className="h-4 w-4" aria-hidden />{t.b.portfolio.mobile}</>)}
         </div>
         <span className="text-xs text-slate-500">{t.b.portfolio.size((new Blob([html]).size / 1024).toFixed(0))}</span>
       </div>

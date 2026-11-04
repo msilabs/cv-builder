@@ -1,4 +1,5 @@
 "use client";
+import { Lock, Sparkles } from "@/components/ui/icons";
 // বিল্ডার পেজ: টুলবার, বাঁ পাশে ফর্ম, ডান পাশে CV / README / পোর্টফোলিওর প্রিভিউ
 import { useMemo, useRef, useState } from "react";
 import { AIPanel } from "@/components/ai/AIPanel";
@@ -102,7 +103,7 @@ export default function BuilderPage() {
           right={
             <>
               <button type="button" onClick={() => openAI()} aria-label={B.actions.ai} className={`${btnAI} w-9 px-0 lg:w-auto lg:px-3`}>
-                <span aria-hidden>🤖</span> <span className="hidden lg:inline">{B.actions.ai}</span>
+                <Sparkles className="h-4 w-4 shrink-0" aria-hidden /> <span className="hidden lg:inline">{B.actions.ai}</span>
               </button>
               <FileMenu isEmpty={isEmpty} onImport={onImport} />
               <ExportActions view={view} markdown={markdown} portfolioHtml={portfolioHtml} leftovers={leftovers} fullName={cv.personal.fullName} />
@@ -134,7 +135,7 @@ export default function BuilderPage() {
           )}
           {view === "readme" && <ReadmeHowTo user={githubUsername(cv.personal.github)} />}
           {view === "portfolio" && <PortfolioHowTo github={cv.personal.github} />}
-          <p className="pb-6 text-center text-[11px] text-slate-500">{B.privacy}</p>
+          <p className="flex items-center justify-center gap-1 pb-6 text-center text-[11px] text-slate-500"><Lock className="h-3 w-3" aria-hidden />{B.privacy}</p>
         </aside>
 
         <main className={`overflow-y-auto bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] p-4 pb-24 [background-size:18px_18px] lg:h-full lg:pb-4 print:block print:h-auto print:overflow-visible print:bg-none print:p-0 ${pane === "preview" ? "" : "hidden lg:block"}`}>

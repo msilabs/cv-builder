@@ -33,7 +33,7 @@ export const sampleCV: CV = {
     linkedin: "linkedin.com/in/tanvir-dev",
     website: "tanvir.dev",
     photo: "",
-    tagline: "Building fintech & mobile products from Dhaka 🇧🇩",
+    tagline: "Building fintech & mobile products from Dhaka, Bangladesh",
     twitter: "",
     blog: "",
     codeforces: "tanvir_cf",

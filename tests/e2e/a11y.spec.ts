@@ -49,7 +49,7 @@ test("dialog keeps focus inside and returns it on close", async ({ page }) => {
 
 test("menus work with the keyboard", async ({ page }) => {
   await openBuilder(page);
-  const fileBtn = page.getByRole("button", { name: /^📁/ });
+  const fileBtn = page.getByRole("button", { name: "ফাইল", exact: true });
   await fileBtn.focus();
   await page.keyboard.press("ArrowDown");
   const items = page.getByRole("menuitem");

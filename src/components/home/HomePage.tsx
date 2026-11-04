@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { ArrowRight, BangladeshFlag, Ban, FileCheck2, FileText, GitHubIcon, Globe, Lightbulb, Lock, Scale, Sparkles, TriangleAlert, Undo2 } from "@/components/ui/icons";
 import { StarButton } from "@/components/toolbar/GitHubButtons";
 import { dict, type Lang } from "@/i18n/dict";
 import { ISSUES_URL, REPO_URL } from "@/lib/site";
@@ -21,6 +22,9 @@ const Check = () => (
     <path fillRule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-7.5 7.5a1 1 0 01-1.4 0L3.3 9.7a1 1 0 111.4-1.4l3.8 3.8 6.8-6.8a1 1 0 011.4 0z" clipRule="evenodd" />
   </svg>
 );
+
+const TRUST_ICONS = [Lock, Ban, FileCheck2, Scale];
+const OUTPUT_ICONS: Record<string, React.ComponentType<{ className?: string }>> = { cv: FileText, readme: GitHubIcon, portfolio: Globe };
 
 const VIEW_HASH: Record<string, string> = { cv: "", readme: "#readme", portfolio: "#portfolio" };
 
@@ -71,7 +75,7 @@ export function HomePage({ lang }: { lang: Lang }) {
               </h1>
               <p className="mt-5 max-w-xl text-lg leading-relaxed text-slate-600 dark:text-slate-400">{h.hero.sub}</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <Link href="/builder" className={primaryBtn}>{h.hero.cta} <span aria-hidden>→</span></Link>
+                <Link href="/builder" className={primaryBtn}>{h.hero.cta} <ArrowRight className="h-4 w-4" aria-hidden /></Link>
                 <a href="#templates" className={secondaryBtn}>{h.hero.secondary}</a>
               </div>
               <p className="mt-3 text-sm text-slate-500">{h.hero.note}</p>
@@ -85,7 +89,7 @@ export function HomePage({ lang }: { lang: Lang }) {
           <ul className="mx-auto grid max-w-6xl grid-cols-2 gap-4 px-4 py-6 text-sm font-medium text-slate-700 md:grid-cols-4 dark:text-slate-300">
             {h.trust.map((x, i) => (
               <li key={x} className="flex items-center justify-center gap-2 text-center">
-                <span aria-hidden>{["🔒", "🚫", "🧾", "⚖️"][i]}</span> {x}
+                {(() => { const TrustIcon = TRUST_ICONS[i]; return <TrustIcon className="h-4 w-4 shrink-0 text-teal-700 dark:text-teal-400" aria-hidden />; })()} {x}
               </li>
             ))}
           </ul>
@@ -99,13 +103,13 @@ export function HomePage({ lang }: { lang: Lang }) {
           <div className="mt-12 grid gap-5 md:grid-cols-3">
             {h.outputs.items.map((o) => (
               <div key={o.key} className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-6 transition hover:-translate-y-0.5 hover:border-teal-300 hover:shadow-xl hover:shadow-teal-900/5 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-teal-700">
-                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 text-2xl dark:bg-teal-950" aria-hidden>{o.icon}</span>
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-50 text-teal-700 dark:bg-teal-950 dark:text-teal-300" aria-hidden>{(() => { const OutIcon = OUTPUT_ICONS[o.key]; return <OutIcon className="h-5 w-5" />; })()}</span>
                 <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-white">{o.title}</h3>
                 <p className="mt-1 text-slate-600 dark:text-slate-400">{o.desc}</p>
                 <ul className="mt-4 flex-1 space-y-2 text-sm text-slate-700 dark:text-slate-300">
                   {o.points.map((p) => <li key={p} className="flex gap-2"><Check />{p}</li>)}
                 </ul>
-                <Link href={`/builder${VIEW_HASH[o.key]}`} className="mt-6 text-sm font-semibold text-teal-700 group-hover:underline dark:text-teal-400">{o.cta} →</Link>
+                <Link href={`/builder${VIEW_HASH[o.key]}`} className="mt-6 text-sm font-semibold text-teal-700 group-hover:underline dark:text-teal-400">{o.cta} <ArrowRight className="inline h-4 w-4" aria-hidden /></Link>
               </div>
             ))}
           </div>
@@ -164,18 +168,18 @@ export function HomePage({ lang }: { lang: Lang }) {
             </div>
             <div aria-hidden className="rounded-3xl bg-gradient-to-br from-violet-100 via-white to-teal-50 p-6 sm:p-10 dark:from-violet-950/60 dark:via-slate-900 dark:to-teal-950/40">
               <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900">
-                <p className="text-sm font-semibold text-slate-900 dark:text-white">🤖 {h.ai.guardTitle}</p>
+                <p className="text-sm font-semibold text-slate-900 dark:text-white"><Sparkles className="mr-1.5 inline h-4 w-4 text-violet-600" aria-hidden />{h.ai.guardTitle}</p>
                 <div className="mt-4 space-y-2 rounded-xl border border-slate-200 p-3 font-mono text-[12px] text-slate-600 dark:border-slate-700 dark:text-slate-400">
                   <p><span className="text-red-500">−</span> Built checkout flow for the web store</p>
                   <p><span className="text-emerald-600">+</span> Built a faster checkout flow for the web store</p>
                   <p><span className="text-emerald-600">+</span> Grew conversion by <mark className="rounded bg-amber-200 px-1 text-amber-900">25%</mark> after redesign</p>
                 </div>
                 <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-200">
-                  <p className="font-semibold">⚠ {h.ai.guardSample}</p>
+                  <p className="flex items-center gap-1.5 font-semibold"><TriangleAlert className="h-4 w-4" aria-hidden />{h.ai.guardSample}</p>
                   <p className="mt-1"><code className="rounded bg-white px-1.5 py-0.5 dark:bg-amber-900">25%</code></p>
                 </div>
                 <p className="mt-4 text-sm text-slate-600 dark:text-slate-400">{h.ai.guardDesc}</p>
-                <p className="mt-3 inline-flex rounded-md bg-violet-50 px-2 py-1 text-xs font-semibold text-violet-800 dark:bg-violet-950 dark:text-violet-300">↩ {h.ai.undo}</p>
+                <p className="mt-3 inline-flex rounded-md bg-violet-50 px-2 py-1 text-xs font-semibold text-violet-800 dark:bg-violet-950 dark:text-violet-300"><Undo2 className="mr-1 inline h-3.5 w-3.5" aria-hidden />{h.ai.undo}</p>
               </div>
             </div>
           </div>
@@ -209,7 +213,7 @@ export function HomePage({ lang }: { lang: Lang }) {
               </ul>
             </div>
             <div className="rounded-2xl border border-teal-200 bg-teal-50/60 p-6 sm:p-8 dark:border-teal-900 dark:bg-teal-950/30">
-              <p className="font-semibold text-slate-900 dark:text-white">💡 {h.bd.tipsTitle}</p>
+              <p className="font-semibold text-slate-900 dark:text-white"><Lightbulb className="mr-1.5 inline h-4 w-4 text-amber-500" aria-hidden />{h.bd.tipsTitle}</p>
               <ul className="mt-4 space-y-3 text-slate-700 dark:text-slate-300">
                 {h.bd.tips.map((p, i) => (
                   <li key={p} className="flex gap-3"><span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold text-teal-700 ring-1 ring-teal-200 dark:bg-slate-900 dark:text-teal-400 dark:ring-teal-800">{i + 1}</span>{p}</li>
@@ -247,8 +251,8 @@ export function HomePage({ lang }: { lang: Lang }) {
             <h2 className="relative text-3xl font-bold tracking-tight sm:text-4xl">{h.final.title}</h2>
             <p className="relative mx-auto mt-3 max-w-xl text-lg text-teal-50/90">{h.final.sub}</p>
             <div className="relative mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/builder" className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-semibold text-teal-800 shadow-lg transition hover:bg-teal-50">{h.final.cta} <span aria-hidden>→</span></Link>
-              <a href={REPO_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-xl border border-white/30 px-6 py-3 font-semibold text-white transition hover:bg-white/10">⭐ GitHub</a>
+              <Link href="/builder" className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-semibold text-teal-800 shadow-lg transition hover:bg-teal-50">{h.final.cta} <ArrowRight className="h-4 w-4" aria-hidden /></Link>
+              <a href={REPO_URL} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-xl border border-white/30 px-6 py-3 font-semibold text-white transition hover:bg-white/10"><GitHubIcon className="h-4 w-4" /> GitHub</a>
             </div>
           </div>
         </section>
@@ -256,7 +260,7 @@ export function HomePage({ lang }: { lang: Lang }) {
 
       <footer className="border-t border-slate-200 dark:border-slate-800">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 text-sm text-slate-500 sm:flex-row">
-          <p>© {new Date().getFullYear()} {t.brand.a}{t.brand.b} · {h.footer.made} 🇧🇩</p>
+          <p>© {new Date().getFullYear()} {t.brand.a}{t.brand.b} · {h.footer.made} <BangladeshFlag /></p>
           <div className="flex items-center gap-5">
             <a className="hover:text-teal-700 dark:hover:text-teal-400" href={REPO_URL} target="_blank" rel="noreferrer">GitHub</a>
             <a className="hover:text-teal-700 dark:hover:text-teal-400" href={ISSUES_URL} target="_blank" rel="noreferrer">{h.footer.issue}</a>

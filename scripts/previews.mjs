@@ -35,7 +35,7 @@ try {
   await page.addInitScript(() => localStorage.setItem("cvbanao:lang", "bn"));
   await page.goto(`http://localhost:${PORT}/builder/`);
   await page.getByRole("button", { name: /নমুনা দেখুন/ }).first().click();
-  await page.getByText("✓ সেভ হয়েছে").waitFor();
+  await page.getByText("সেভ হয়েছে", { exact: true }).waitFor();
 
   // ৬টা টেমপ্লেট
   await page.getByRole("button", { name: /সব টেমপ্লেট/ }).click();

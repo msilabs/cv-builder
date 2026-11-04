@@ -1,11 +1,12 @@
 "use client";
+import { Star, AlignLeft, Award, Briefcase, ChevronUp, GraduationCap, Languages, Rocket, Trophy, User, Wrench, X } from "@/components/ui/icons";
 import { useDialogs } from "@/components/ui/Dialogs";
 import { useLang } from "@/i18n/lang";
 import type { CV, SectionKey, Education, Experience, Project, SimpleItem, SkillGroup } from "@/lib/types";
 import { compressImage } from "@/lib/image";
 import { cvProgress } from "@/lib/progress";
 import { commaList, fmtRange, uid } from "@/lib/utils";
-import { AddButton, Field, ItemCard, listOps, Section } from "./fields";
+import { AddButton, Field, ItemCard, listOps, Section, type SectionIcon } from "./fields";
 
 export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; setCV: (fn: (c: CV) => CV) => void; hidden: SectionKey[]; toggleSection: (k: SectionKey) => void }) {
   const { t } = useLang();
@@ -35,7 +36,7 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
 
   return (
     <div className="space-y-3">
-      <Section id="personal" done={prog.sectionDone("personal")} title={L.personal} icon="👤" defaultOpen>
+      <Section id="personal" done={prog.sectionDone("personal")} title={L.personal} icon={User} defaultOpen>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field id="field-fullName" label={L.fullName} value={p.fullName} onChange={(v) => setP("fullName", v)} placeholder="Tanvir Ahmed" />
           <Field label={L.title} value={p.title} onChange={(v) => setP("title", v)} placeholder="Flutter Developer" />
@@ -47,7 +48,7 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
           <Field label={L.website} value={p.website} onChange={(v) => setP("website", v)} placeholder="yourname.dev" />
           <div className="sm:col-span-2">
             <Field label={L.tagline} value={p.tagline} onChange={(v) => setP("tagline", v)}
-              placeholder="Building fast, accessible web apps from Dhaka 🇧🇩" />
+              placeholder="Building fast, accessible web apps from Dhaka" />
           </div>
         </div>
         <details className="rounded-lg border border-slate-200 bg-slate-50 p-3">
@@ -61,7 +62,7 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
         </details>
         <label className="flex items-center gap-2 text-sm text-slate-700">
           <input type="checkbox" checked={cv.openToWork} onChange={(e) => set("openToWork", e.target.checked)} />
-          {L.openToWork}
+          <span className="inline-flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-500" aria-hidden />{L.openToWork}</span>
         </label>
         <div className="flex items-center gap-3">
           {p.photo && (
@@ -77,7 +78,7 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
         <p className="text-[11px] text-slate-500">{L.photoTip}</p>
       </Section>
 
-      <Section {...vis("summary")} id="summary" done={prog.sectionDone("summary")} title={L.summary} icon="📝">
+      <Section {...vis("summary")} id="summary" done={prog.sectionDone("summary")} title={L.summary} icon={AlignLeft}>
         <Field
           label={L.summaryLabel} textarea value={cv.summary} onChange={(v) => set("summary", v)}
           placeholder="Backend developer with 2+ years of experience in Node.js..."
@@ -85,7 +86,7 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
         />
       </Section>
 
-      <Section {...vis("skills")} id="skills" done={prog.sectionDone("skills")} title={L.skills} icon="🛠️" count={cv.skills.length}>
+      <Section {...vis("skills")} id="skills" done={prog.sectionDone("skills")} title={L.skills} icon={Wrench} count={cv.skills.length}>
         {cv.skills.map((s, i) => (
           <ItemCard key={s.id} title={s.name || L.newGroup} subtitle={commaList(s.items).join(", ")} onRemove={() => sk.remove(s.id)} onUp={i > 0 ? () => sk.move(i, -1) : undefined} onDown={i < cv.skills.length - 1 ? () => sk.move(i, 1) : undefined}>
             <Field label={L.groupName} value={s.name} onChange={(v) => sk.update(s.id, { name: v })} placeholder="Frontend" />
@@ -100,7 +101,7 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
         <AddButton onClick={() => sk.add({ id: uid(), name: "", items: "" })}>{L.addGroup}</AddButton>
       </Section>
 
-      <Section {...vis("experience")} id="experience" done={cv.experience.length > 0} title={L.experience} icon="💼" count={cv.experience.length}>
+      <Section {...vis("experience")} id="experience" done={cv.experience.length > 0} title={L.experience} icon={Briefcase} count={cv.experience.length}>
         {cv.experience.map((e, i) => (
           <ItemCard key={e.id} title={e.role || e.company || L.newExperience} subtitle={[e.company, fmtRange(e.start, e.end, e.current)].filter(Boolean).join(" · ")} onRemove={() => exp.remove(e.id)} onUp={i > 0 ? () => exp.move(i, -1) : undefined} onDown={i < cv.experience.length - 1 ? () => exp.move(i, 1) : undefined}>
             <Field label={L.role} value={e.role} onChange={(v) => exp.update(e.id, { role: v })} placeholder="Software Engineer" />
@@ -124,7 +125,7 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
         <AddButton onClick={() => exp.add({ id: uid(), company: "", role: "", location: "", start: "", end: "", current: false, bullets: "" })}>{L.addExperience}</AddButton>
       </Section>
 
-      <Section {...vis("projects")} id="projects" done={prog.sectionDone("projects")} title={L.projects} icon="🚀" count={cv.projects.length}>
+      <Section {...vis("projects")} id="projects" done={prog.sectionDone("projects")} title={L.projects} icon={Rocket} count={cv.projects.length}>
         {cv.projects.map((pr, i) => (
           <ItemCard key={pr.id} title={pr.name || L.newProject} subtitle={pr.tech} onRemove={() => proj.remove(pr.id)} onUp={i > 0 ? () => proj.move(i, -1) : undefined} onDown={i < cv.projects.length - 1 ? () => proj.move(i, 1) : undefined}>
             <Field label={L.projectName} value={pr.name} onChange={(v) => proj.update(pr.id, { name: v })} placeholder="E-commerce App" />
@@ -133,7 +134,7 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
             <Field label={L.repo} value={pr.repo} onChange={(v) => proj.update(pr.id, { repo: v })} placeholder="github.com/you/repo" />
             <label className="flex items-center gap-2 text-xs text-slate-600 sm:col-span-2">
               <input type="checkbox" checked={pr.featured} onChange={(e) => proj.update(pr.id, { featured: e.target.checked })} />
-              {L.featured}
+              <span className="inline-flex items-center gap-1"><Star className="h-3.5 w-3.5 text-amber-500" aria-hidden />{L.featured}</span>
             </label>
             <div className="sm:col-span-2">
               <Field label={L.projectBullets} textarea rows={3} value={pr.bullets} onChange={(v) => proj.update(pr.id, { bullets: v })} placeholder="What it does, your role, impact" />
@@ -143,7 +144,7 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
         <AddButton onClick={() => proj.add({ id: uid(), name: "", tech: "", link: "", repo: "", featured: false, bullets: "" })}>{L.addProject}</AddButton>
       </Section>
 
-      <Section {...vis("education")} id="education" done={prog.sectionDone("education")} title={L.education} icon="🎓" count={cv.education.length}>
+      <Section {...vis("education")} id="education" done={prog.sectionDone("education")} title={L.education} icon={GraduationCap} count={cv.education.length}>
         {cv.education.map((ed, i) => (
           <ItemCard key={ed.id} title={ed.degree || L.newDegree} subtitle={[ed.institution, ed.result].filter(Boolean).join(" · ")} onRemove={() => edu.remove(ed.id)} onUp={i > 0 ? () => edu.move(i, -1) : undefined} onDown={i < cv.education.length - 1 ? () => edu.move(i, 1) : undefined}>
             <Field label={L.degree} value={ed.degree} onChange={(v) => edu.update(ed.id, { degree: v })} placeholder="B.Sc. in CSE / HSC / SSC" />
@@ -158,17 +159,17 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
         <AddButton onClick={() => edu.add({ id: uid(), degree: "", institution: "", result: "", start: "", end: "" })}>{L.addEducation}</AddButton>
       </Section>
 
-      <SimpleList {...vis("achievements")} title={L.achievements} icon="🏆" items={cv.achievements} onChange={(l) => set("achievements", l)} placeholder="ICPC Dhaka Regional 2023 – Ranked 45th" />
-      <SimpleList {...vis("certifications")} title={L.certifications} icon="📜" items={cv.certifications} onChange={(l) => set("certifications", l)} placeholder="AWS Certified Developer – Associate" />
+      <SimpleList {...vis("achievements")} title={L.achievements} icon={Trophy} items={cv.achievements} onChange={(l) => set("achievements", l)} placeholder="ICPC Dhaka Regional 2023 – Ranked 45th" />
+      <SimpleList {...vis("certifications")} title={L.certifications} icon={Award} items={cv.certifications} onChange={(l) => set("certifications", l)} placeholder="AWS Certified Developer – Associate" />
 
-      <Section {...vis("languages")} title={L.languages} icon="🌐">
+      <Section {...vis("languages")} title={L.languages} icon={Languages}>
         <Field label={L.languages} value={cv.languages} onChange={(v) => set("languages", v)} placeholder="Bangla (Native), English (Professional)" />
       </Section>
     </div>
   );
 }
 
-function SimpleList({ title, icon, items, onChange, placeholder, visible, onToggleVisible }: { title: string; icon: string; items: SimpleItem[]; onChange: (l: SimpleItem[]) => void; placeholder: string; visible: boolean; onToggleVisible: () => void }) {
+function SimpleList({ title, icon, items, onChange, placeholder, visible, onToggleVisible }: { title: string; icon: SectionIcon; items: SimpleItem[]; onChange: (l: SimpleItem[]) => void; placeholder: string; visible: boolean; onToggleVisible: () => void }) {
   const ops = listOps(items, onChange);
   const { t } = useLang();
   return (
@@ -176,8 +177,8 @@ function SimpleList({ title, icon, items, onChange, placeholder, visible, onTogg
       {items.map((a, i) => (
         <div key={a.id} className="flex gap-2">
           <input className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-teal-600" value={a.text} placeholder={placeholder} onChange={(e) => ops.update(a.id, { text: e.target.value })} />
-          <button type="button" aria-label={t.b.fields.up} className="text-slate-500 disabled:opacity-30" disabled={i === 0} onClick={() => ops.move(i, -1)}>↑</button>
-          <button type="button" aria-label={t.b.fields.remove} className="px-1 text-red-500" onClick={() => ops.remove(a.id)}>✕</button>
+          <button type="button" aria-label={t.b.fields.up} className="text-slate-500 disabled:opacity-30" disabled={i === 0} onClick={() => ops.move(i, -1)}><ChevronUp className="h-4 w-4" aria-hidden /></button>
+          <button type="button" aria-label={t.b.fields.remove} className="px-1 text-red-500" onClick={() => ops.remove(a.id)}><X className="h-4 w-4" aria-hidden /></button>
         </div>
       ))}
       <AddButton onClick={() => ops.add({ id: uid(), text: "" })}>{t.b.editor.add}</AddButton>

@@ -1,4 +1,5 @@
 "use client";
+import { Code, Eye } from "@/components/ui/icons";
 import { useLang } from "@/i18n/lang";
 import { useState } from "react";
 import { copyText, downloadText } from "@/lib/files";
@@ -63,16 +64,16 @@ export function ReadmeHowTo({ user }: { user: string }) {
 export function ReadmePreviewPane({ markdown }: { markdown: string }) {
   const [mode, setMode] = useState<"preview" | "code">("preview");
   const { t } = useLang();
-  const tabBtn = (m: typeof mode, label: string) => (
+  const tabBtn = (m: typeof mode, label: React.ReactNode) => (
     <button type="button" onClick={() => setMode(m)}
-      className={`rounded-md px-3 py-1 text-sm ${mode === m ? "bg-white font-medium text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}>{label}</button>
+      className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1 text-sm ${mode === m ? "bg-white font-medium text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}>{label}</button>
   );
   return (
     <div className="mx-auto flex h-full max-w-4xl flex-col gap-3">
       <div className="flex items-center justify-between">
         <div className="flex gap-1 rounded-lg bg-slate-200/70 p-1">
-          {tabBtn("preview", t.b.readme.tabPreview)}
-          {tabBtn("code", t.b.readme.tabCode)}
+          {tabBtn("preview", <><Eye className="h-4 w-4" aria-hidden />{t.b.readme.tabPreview}</>)}
+          {tabBtn("code", <><Code className="h-4 w-4" aria-hidden />{t.b.readme.tabCode}</>)}
         </div>
         <span className="text-xs text-slate-500">{t.b.readme.lines(markdown.split("\n").length)}</span>
       </div>

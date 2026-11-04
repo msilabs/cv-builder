@@ -12,7 +12,7 @@ test("sample CV prints to a single A4 page", async ({ page }) => {
 test("data survives a reload", async ({ page }) => {
   await openBuilder(page);
   await page.locator("#field-fullName").fill("Rahim Uddin");
-  await expect(page.getByText("✓ সেভ হয়েছে")).toBeVisible();
+  await expect(page.getByText("সেভ হয়েছে", { exact: true })).toBeVisible();
   await page.reload();
   await expect(page.locator("#field-fullName")).toHaveValue("Rahim Uddin");
 });
@@ -90,7 +90,7 @@ test("large photos are resized before saving", async ({ page }) => {
   await openBuilder(page);
   await page.locator('input[type="file"][accept="image/*"]').setInputFiles("tests/e2e/fixtures/big-photo.png");
   await expect(page.locator("img[src^='data:image/jpeg']").first()).toBeVisible();
-  await expect(page.getByText("✓ সেভ হয়েছে")).toBeVisible();
+  await expect(page.getByText("সেভ হয়েছে", { exact: true })).toBeVisible();
   const photo = await page.evaluate(() => JSON.parse(localStorage.getItem("cvbanao:data:v2")!).profiles[0].cv.personal.photo as string);
   expect(photo.startsWith("data:image/jpeg")).toBe(true);
   expect(photo.length).toBeLessThan(120_000);

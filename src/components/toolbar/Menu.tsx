@@ -1,4 +1,5 @@
 "use client";
+import { ChevronDown } from "@/components/ui/icons";
 import { useEffect, useRef, useState } from "react";
 import { btnOutline } from "@/components/ui/styles";
 
@@ -56,7 +57,7 @@ export function Menu({ label, children, align = "right", badge, buttonClass, ari
       <button ref={btn} type="button" aria-expanded={open} aria-haspopup="menu" aria-label={ariaLabel} onClick={() => setOpen(!open)}
         onKeyDown={(e) => { if (e.key === "ArrowDown" && !open) { e.preventDefault(); setOpen(true); } }}
         className={`relative ${buttonClass ?? btnOutline}`}>
-        {label} {caret && <span className="text-[10px] text-slate-500" aria-hidden>▾</span>}
+        {label} {caret && <ChevronDown className="h-3.5 w-3.5 text-slate-500" aria-hidden />}
         {badge && <span className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-amber-500 ring-2 ring-white" />}
       </button>
       {open && (
@@ -68,12 +69,15 @@ export function Menu({ label, children, align = "right", badge, buttonClass, ari
   );
 }
 
-export function MenuItem({ onClick, children, danger, hint }: { onClick: () => void; children: React.ReactNode; danger?: boolean; hint?: string }) {
+export function MenuItem({ onClick, children, danger, hint, icon: Icon }: { onClick: () => void; children: React.ReactNode; danger?: boolean; hint?: string; icon?: React.ComponentType<{ className?: string }> }) {
   return (
     <button type="button" role="menuitem" onClick={onClick}
-      className={`block w-full rounded-md px-3 py-2 text-left text-sm outline-none hover:bg-slate-100 focus-visible:bg-slate-100 focus-visible:ring-2 focus-visible:ring-teal-600/30 ${danger ? "text-red-600" : "text-slate-700"}`}>
-      {children}
-      {hint && <span className="block text-[11px] text-slate-500">{hint}</span>}
+      className={`flex w-full items-start gap-2.5 rounded-md px-3 py-2 text-left text-sm outline-none hover:bg-slate-100 focus-visible:bg-slate-100 focus-visible:ring-2 focus-visible:ring-teal-600/30 ${danger ? "text-red-600" : "text-slate-700"}`}>
+      {Icon && <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${danger ? "text-red-500" : "text-slate-500"}`} />}
+      <span className="min-w-0">
+        {children}
+        {hint && <span className="block text-[11px] text-slate-500">{hint}</span>}
+      </span>
     </button>
   );
 }

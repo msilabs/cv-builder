@@ -1,4 +1,5 @@
 "use client";
+import { FileText, Minus, Plus } from "@/components/ui/icons";
 import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/i18n/lang";
 import type { TemplateProps } from "@/lib/types";
@@ -51,11 +52,11 @@ export default function Preview({ cv, settings, empty = false }: TemplateProps &
           {pages > 2 && t.b.preview.tooLong}
         </span>
         <div className="flex items-center rounded-lg border border-slate-200 bg-white p-0.5 shadow-sm">
-          <button type="button" className={zbtn} onClick={() => step(-1)} disabled={scale <= ZOOMS[0]} aria-label={Z.out} title={Z.out}>−</button>
+          <button type="button" className={zbtn} onClick={() => step(-1)} disabled={scale <= ZOOMS[0]} aria-label={Z.out} title={Z.out}><Minus className="h-3.5 w-3.5" aria-hidden /></button>
           <button type="button" className={`${zbtn} ${zoom === "fit" ? "bg-teal-50 text-teal-800" : ""}`} onClick={() => setZoom("fit")}>
             {zoom === "fit" ? Z.fit : `${Math.round(scale * 100)}%`}
           </button>
-          <button type="button" className={zbtn} onClick={() => step(1)} disabled={scale >= ZOOMS[ZOOMS.length - 1]} aria-label={Z.in} title={Z.in}>+</button>
+          <button type="button" className={zbtn} onClick={() => step(1)} disabled={scale >= ZOOMS[ZOOMS.length - 1]} aria-label={Z.in} title={Z.in}><Plus className="h-3.5 w-3.5" aria-hidden /></button>
         </div>
       </div>
       <div className="overflow-x-auto pb-2 print:overflow-visible print:p-0">
@@ -71,7 +72,7 @@ export default function Preview({ cv, settings, empty = false }: TemplateProps &
           {empty && (
             <div className="absolute inset-x-0 top-[28%] flex justify-center px-6 print:hidden">
               <div className="max-w-xs rounded-2xl border border-dashed border-slate-300 bg-white/90 p-5 text-center shadow-sm backdrop-blur">
-                <p className="text-3xl" aria-hidden>📄</p>
+                <FileText className="mx-auto h-8 w-8 text-slate-400" aria-hidden />
                 <p className="mt-2 font-semibold text-slate-800">{t.b.emptyPreview.title}</p>
                 <p className="mt-1 hidden text-sm text-slate-500 lg:block">{t.b.emptyPreview.body}</p>
                 <p className="mt-1 text-sm text-slate-500 lg:hidden">{t.b.emptyPreview.bodyMobile}</p>

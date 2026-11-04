@@ -33,9 +33,9 @@ export const en: Dict = {
       title: "Write it once, use it everywhere",
       sub: "Add a new job or project and your CV, README and portfolio all update together.",
       items: [
-        { key: "cv", icon: "📄", title: "ATS-friendly CV", desc: "6 templates, live A4 preview, one-click PDF.", points: ["Easy for applicant tracking systems to read", "CGPA, SSC/HSC and +880 formats", "Separate CV versions per job"], cta: "Build a CV" },
-        { key: "readme", icon: "🐙", title: "GitHub profile README", desc: "4 styles, tech badges generated from your skills.", points: ["Rendered preview", "Copy Markdown in one click", "Optional GitHub stats"], cta: "Build a README" },
-        { key: "portfolio", icon: "🌐", title: "Portfolio site", desc: "3 themes, a single index.html file.", points: ["Free hosting on GitHub Pages", "Mobile-friendly, dark mode", "Phone number hidden by default"], cta: "Build a portfolio" },
+        { key: "cv", title: "ATS-friendly CV", desc: "6 templates, live A4 preview, one-click PDF.", points: ["Easy for applicant tracking systems to read", "CGPA, SSC/HSC and +880 formats", "Separate CV versions per job"], cta: "Build a CV" },
+        { key: "readme", title: "GitHub profile README", desc: "4 styles, tech badges generated from your skills.", points: ["Rendered preview", "Copy Markdown in one click", "Optional GitHub stats"], cta: "Build a README" },
+        { key: "portfolio", title: "Portfolio site", desc: "3 themes, a single index.html file.", points: ["Free hosting on GitHub Pages", "Mobile-friendly, dark mode", "Phone number hidden by default"], cta: "Build a portfolio" },
       ],
     },
     templates: {
