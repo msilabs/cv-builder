@@ -30,7 +30,7 @@ export function ReadmeSettingsPanel() {
         <input type="checkbox" className="mt-1" checked={rs.showStats} disabled={rs.style === "minimal"} onChange={(e) => set({ showStats: e.target.checked })} />
         <span>
           {L.stats}
-          <span className="block text-[11px] text-slate-400">{L.statsHint}{!user && L.statsNeedGithub}</span>
+          <span className="block text-[11px] text-slate-500">{L.statsHint}{!user && L.statsNeedGithub}</span>
         </span>
       </label>
       <p className="rounded-lg bg-slate-50 p-2 text-[11px] leading-relaxed text-slate-500">
@@ -65,7 +65,7 @@ export function ReadmePreviewPane({ markdown }: { markdown: string }) {
   const { t } = useLang();
   const tabBtn = (m: typeof mode, label: string) => (
     <button type="button" onClick={() => setMode(m)}
-      className={`rounded-md px-3 py-1 text-sm ${mode === m ? "bg-white font-medium text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}>{label}</button>
+      className={`rounded-md px-3 py-1 text-sm ${mode === m ? "bg-white font-medium text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}>{label}</button>
   );
   return (
     <div className="mx-auto flex h-full max-w-4xl flex-col gap-3">
@@ -74,7 +74,7 @@ export function ReadmePreviewPane({ markdown }: { markdown: string }) {
           {tabBtn("preview", t.b.readme.tabPreview)}
           {tabBtn("code", t.b.readme.tabCode)}
         </div>
-        <span className="text-xs text-slate-400">{t.b.readme.lines(markdown.split("\n").length)}</span>
+        <span className="text-xs text-slate-500">{t.b.readme.lines(markdown.split("\n").length)}</span>
       </div>
       {mode === "preview" ? (
         <MarkdownFrame markdown={markdown} />

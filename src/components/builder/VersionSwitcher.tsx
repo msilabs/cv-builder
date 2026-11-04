@@ -28,7 +28,7 @@ export function VersionSwitcher() {
       label={<><span aria-hidden>🗂</span><span className="truncate">{profile.name}</span></>}>
       {(close) => (
         <div className="w-72">
-          <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">{L.heading(data.profiles.length)}</p>
+          <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">{L.heading(data.profiles.length)}</p>
           <div className="max-h-64 overflow-y-auto">
             {data.profiles.map((p) => (
               <button key={p.id} type="button" onClick={() => { switchProfile(p.id); close(); }}
@@ -36,7 +36,7 @@ export function VersionSwitcher() {
                 <span className="mt-0.5 w-4 text-teal-700">{p.id === profile.id ? "✓" : ""}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-medium text-slate-800">{p.name}</span>
-                  <span className="block text-[11px] text-slate-400">{p.cv.personal.fullName || L.noName} · {ago(p.updatedAt, t.b.ago)}</span>
+                  <span className="block text-[11px] text-slate-500">{p.cv.personal.fullName || L.noName} · {ago(p.updatedAt, t.b.ago)}</span>
                 </span>
               </button>
             ))}

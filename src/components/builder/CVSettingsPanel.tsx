@@ -56,7 +56,7 @@ export function CVSettingsPanel() {
         </div>
       )}
       {open && (
-        <p className="mt-2 text-[11px] text-slate-400">
+        <p className="mt-2 text-[11px] text-slate-500">
           {L.atsNote}
         </p>
       )}

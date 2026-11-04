@@ -17,9 +17,9 @@ export function Field({
       {textarea ? (
         <textarea className={inputCls} rows={rows} value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} />
       ) : (
-        <input id={id} className={`${inputCls} disabled:bg-slate-100 disabled:text-slate-400`} type={type} value={value} placeholder={placeholder} disabled={disabled} onChange={(e) => onChange(e.target.value)} />
+        <input id={id} className={`${inputCls} disabled:bg-slate-100 disabled:text-slate-500`} type={type} value={value} placeholder={placeholder} disabled={disabled} onChange={(e) => onChange(e.target.value)} />
       )}
-      {hint && <span className="mt-1 block text-[11px] text-slate-400">{hint}</span>}
+      {hint && <span className="mt-1 block text-[11px] text-slate-500">{hint}</span>}
     </label>
   );
 }
@@ -57,13 +57,13 @@ export function Section({ title, icon, children, defaultOpen = false, count, vis
     <section ref={ref} id={id ? `section-${id}` : undefined} className={`scroll-mt-4 rounded-xl border bg-white shadow-sm transition ${hidden ? "border-dashed border-slate-300" : "border-slate-200 hover:border-slate-300"}`}>
       <div className="flex items-center gap-3 pr-4">
         <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} className="flex min-w-0 flex-1 items-center justify-between rounded-xl px-4 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-teal-600/40">
-          <span className={`flex items-center gap-2 font-semibold ${hidden ? "text-slate-400" : "text-slate-800"}`}>
+          <span className={`flex items-center gap-2 font-semibold ${hidden ? "text-slate-500" : "text-slate-800"}`}>
             <span aria-hidden className={`flex h-7 w-7 items-center justify-center rounded-lg text-base ${hidden ? "bg-slate-50 opacity-50" : "bg-slate-100"}`}>{icon}</span> {title}
-            {done && !hidden && <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[10px] text-white" aria-label="✓">✓</span>}
+            {done && !hidden && <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[10px] text-white" role="img" aria-label={t.b.fields.done}>✓</span>}
             {count !== undefined && count > 0 && <span className="rounded-full bg-teal-50 px-2 text-xs font-medium text-teal-700">{count}</span>}
             {hidden && <span className="rounded bg-slate-100 px-1.5 text-[11px] font-normal text-slate-500">{t.b.fields.hidden}</span>}
           </span>
-          <span className={`text-slate-400 transition ${open ? "rotate-180" : ""}`}>▾</span>
+          <span className={`text-slate-500 transition ${open ? "rotate-180" : ""}`}>▾</span>
         </button>
         {onToggleVisible && <Toggle on={!hidden} onChange={onToggleVisible} label={t.b.fields.toggle(title)} />}
       </div>
@@ -81,7 +81,7 @@ export function ItemCard({ title, subtitle, onRemove, onUp, onDown, children }: 
       <div className={`flex items-center justify-between gap-2 ${open ? "mb-2" : ""}`}>
         <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} title={open ? t.b.item.collapse : t.b.item.expand}
           className="flex min-w-0 flex-1 items-center gap-1.5 text-left">
-          <span className={`text-[10px] text-slate-400 transition ${open ? "" : "-rotate-90"}`} aria-hidden>▾</span>
+          <span className={`text-[10px] text-slate-500 transition ${open ? "" : "-rotate-90"}`} aria-hidden>▾</span>
           <span className="min-w-0">
             <span className="block truncate text-sm font-medium text-slate-800">{title}</span>
             {!open && subtitle && <span className="block truncate text-[11px] text-slate-500">{subtitle}</span>}

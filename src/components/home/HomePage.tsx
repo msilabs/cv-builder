@@ -189,7 +189,7 @@ export function HomePage({ lang }: { lang: Lang }) {
             <ol className="mt-10 grid gap-5 md:grid-cols-3">
               {h.how.steps.map((s, i) => (
                 <li key={s.title} className="relative rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
-                  <span className="text-5xl font-bold text-teal-600/15 dark:text-teal-400/20">0{i + 1}</span>
+                  <span aria-hidden className="text-5xl font-bold text-teal-600/15 dark:text-teal-400/20">0{i + 1}</span>
                   <p className="mt-2 text-lg font-semibold text-slate-900 dark:text-white">{s.title}</p>
                   <p className="mt-1 text-slate-600 dark:text-slate-400">{s.desc}</p>
                 </li>

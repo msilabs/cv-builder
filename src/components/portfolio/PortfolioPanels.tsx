@@ -14,9 +14,9 @@ export function PortfolioSettingsPanel() {
   const ps = settings.portfolio;
   const set = (patch: Partial<PortfolioSettings>) => setSettings((s) => ({ ...s, portfolio: { ...s.portfolio, ...patch } }));
   const check = (key: "showEmail" | "showPhone" | "showLocation" | "showPhoto", label: string, hint?: string, disabled?: boolean) => (
-    <label className={`flex items-start gap-2 text-sm ${disabled ? "text-slate-400" : "text-slate-700"}`}>
+    <label className={`flex items-start gap-2 text-sm ${disabled ? "text-slate-500" : "text-slate-700"}`}>
       <input type="checkbox" className="mt-1" checked={ps[key] && !disabled} disabled={disabled} onChange={(e) => set({ [key]: e.target.checked })} />
-      <span>{label}{hint && <span className="block text-[11px] text-slate-400">{hint}</span>}</span>
+      <span>{label}{hint && <span className="block text-[11px] text-slate-500">{hint}</span>}</span>
     </label>
   );
   return (
@@ -65,7 +65,7 @@ export function PortfolioHowTo({ github }: { github: string }) {
       <p className="mt-1">
         <a className="text-teal-700 underline" href="https://app.netlify.com/drop" target="_blank" rel="noreferrer">app.netlify.com/drop</a> {L.netlify}
       </p>
-      <p className="mt-3 text-[11px] text-slate-400">{L.update}</p>
+      <p className="mt-3 text-[11px] text-slate-500">{L.update}</p>
     </details>
   );
 }
@@ -75,7 +75,7 @@ export function PortfolioPreviewPane({ html }: { html: string }) {
   const { t } = useLang();
   const btn = (d: typeof device, label: string) => (
     <button type="button" onClick={() => setDevice(d)}
-      className={`rounded-md px-3 py-1 text-sm ${device === d ? "bg-white font-medium text-slate-900 shadow-sm" : "text-slate-500 hover:text-slate-800"}`}>{label}</button>
+      className={`rounded-md px-3 py-1 text-sm ${device === d ? "bg-white font-medium text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}>{label}</button>
   );
   return (
     <div className="mx-auto flex h-full max-w-6xl flex-col gap-3">
@@ -84,7 +84,7 @@ export function PortfolioPreviewPane({ html }: { html: string }) {
           {btn("desktop", t.b.portfolio.desktop)}
           {btn("mobile", t.b.portfolio.mobile)}
         </div>
-        <span className="text-xs text-slate-400">{t.b.portfolio.size((new Blob([html]).size / 1024).toFixed(0))}</span>
+        <span className="text-xs text-slate-500">{t.b.portfolio.size((new Blob([html]).size / 1024).toFixed(0))}</span>
       </div>
       <div className="flex flex-1 justify-center">
         <iframe title="Portfolio preview" sandbox="allow-popups allow-popups-to-escape-sandbox" srcDoc={html}

@@ -218,7 +218,7 @@ export default function BuilderPage() {
             <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900">
               <p className="font-semibold">{B.leftover.title}</p>
               <p className="mt-1">{B.leftover.body} <b>{leftovers.join(", ")}</b></p>
-              <button className="mt-2 rounded-md bg-amber-600 px-3 py-1 text-xs font-semibold text-white hover:bg-amber-700" onClick={async () => (await confirm({ message: B.leftover.confirmClear, confirmLabel: B.dialogs.clear, danger: true })) && setCV(emptyCV)}>
+              <button className="mt-2 rounded-md bg-amber-700 px-3 py-1 text-xs font-semibold text-white hover:bg-amber-800" onClick={async () => (await confirm({ message: B.leftover.confirmClear, confirmLabel: B.dialogs.clear, danger: true })) && setCV(emptyCV)}>
                 {B.leftover.clear}
               </button>
             </div>
@@ -233,7 +233,7 @@ export default function BuilderPage() {
           )}
           {view === "readme" && <ReadmeHowTo user={githubUsername(cv.personal.github)} />}
           {view === "portfolio" && <PortfolioHowTo github={cv.personal.github} />}
-          <p className="pb-6 text-center text-[11px] text-slate-400">{B.privacy}</p>
+          <p className="pb-6 text-center text-[11px] text-slate-500">{B.privacy}</p>
         </aside>
 
         <main className={`overflow-y-auto bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] p-4 pb-24 [background-size:18px_18px] lg:h-full lg:pb-4 print:block print:bg-none print:h-auto print:overflow-visible print:p-0 ${pane === "preview" ? "" : "hidden lg:block"}`}>

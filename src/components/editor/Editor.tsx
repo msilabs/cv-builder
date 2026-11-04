@@ -74,7 +74,7 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
           </label>
           {p.photo && <button type="button" className="text-sm text-red-500" onClick={() => setP("photo", "")}>{L.photoRemove}</button>}
         </div>
-        <p className="text-[11px] text-slate-400">{L.photoTip}</p>
+        <p className="text-[11px] text-slate-500">{L.photoTip}</p>
       </Section>
 
       <Section {...vis("summary")} id="summary" done={prog.sectionDone("summary")} title={L.summary} icon="📝">
@@ -176,7 +176,7 @@ function SimpleList({ title, icon, items, onChange, placeholder, visible, onTogg
       {items.map((a, i) => (
         <div key={a.id} className="flex gap-2">
           <input className="w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none focus:border-teal-600" value={a.text} placeholder={placeholder} onChange={(e) => ops.update(a.id, { text: e.target.value })} />
-          <button type="button" aria-label={t.b.fields.up} className="text-slate-400 disabled:opacity-30" disabled={i === 0} onClick={() => ops.move(i, -1)}>↑</button>
+          <button type="button" aria-label={t.b.fields.up} className="text-slate-500 disabled:opacity-30" disabled={i === 0} onClick={() => ops.move(i, -1)}>↑</button>
           <button type="button" aria-label={t.b.fields.remove} className="px-1 text-red-500" onClick={() => ops.remove(a.id)}>✕</button>
         </div>
       ))}

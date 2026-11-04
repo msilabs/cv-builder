@@ -230,6 +230,7 @@ export const builderEn: typeof builderBn = {
     hiddenTitle: "Hidden, click to show",
     hidden: "Hidden",
     toggle: (title) => `Show or hide ${title}`,
+    done: "Complete",
     up: "Move up",
     down: "Move down",
     remove: "Delete",

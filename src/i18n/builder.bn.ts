@@ -229,6 +229,7 @@ export const builderBn = {
     hiddenTitle: "লুকানো আছে, দেখাতে চাপুন",
     hidden: "লুকানো",
     toggle: (title: string) => `${title} দেখান বা লুকান`,
+    done: "সম্পূর্ণ",
     up: "উপরে",
     down: "নিচে",
     remove: "মুছুন",
