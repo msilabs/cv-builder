@@ -34,7 +34,24 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
           <Field label="GitHub" value={p.github} onChange={(v) => setP("github", v)} placeholder="github.com/username" />
           <Field label="LinkedIn" value={p.linkedin} onChange={(v) => setP("linkedin", v)} placeholder="linkedin.com/in/username" />
           <Field label="পোর্টফোলিও / ওয়েবসাইট" value={p.website} onChange={(v) => setP("website", v)} placeholder="yourname.dev" />
+          <div className="sm:col-span-2">
+            <Field label="এক লাইনের পরিচিতি (README ও পোর্টফোলিওর জন্য)" value={p.tagline} onChange={(v) => setP("tagline", v)}
+              placeholder="Building fast, accessible web apps from Dhaka 🇧🇩" />
+          </div>
         </div>
+        <details className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+          <summary className="cursor-pointer text-sm font-medium text-slate-700">আরও লিংক (ঐচ্ছিক, README ও পোর্টফোলিওতে দেখাবে)</summary>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <Field label="X / Twitter" value={p.twitter} onChange={(v) => setP("twitter", v)} placeholder="@username" />
+            <Field label="ব্লগ (Medium, dev.to, Hashnode)" value={p.blog} onChange={(v) => setP("blog", v)} placeholder="medium.com/@username" />
+            <Field label="Codeforces username" value={p.codeforces} onChange={(v) => setP("codeforces", v)} placeholder="tourist" />
+            <Field label="LeetCode username" value={p.leetcode} onChange={(v) => setP("leetcode", v)} placeholder="username" />
+          </div>
+        </details>
+        <label className="flex items-center gap-2 text-sm text-slate-700">
+          <input type="checkbox" checked={cv.openToWork} onChange={(e) => set("openToWork", e.target.checked)} />
+          🟢 নতুন চাকরি খুঁজছি (README ও পোর্টফোলিওতে &quot;Open to work&quot; দেখাবে)
+        </label>
         <div className="flex items-center gap-3">
           {p.photo && (
             // eslint-disable-next-line @next/next/no-img-element
@@ -98,6 +115,10 @@ export default function Editor({ cv, setCV, hidden, toggleSection }: { cv: CV; s
             <Field label="টেক স্ট্যাক" value={pr.tech} onChange={(v) => proj.update(pr.id, { tech: v })} placeholder="Flutter, Firebase" />
             <Field label="লাইভ / Play Store / App Store লিংক" value={pr.link} onChange={(v) => proj.update(pr.id, { link: v })} placeholder="myapp.com" />
             <Field label="সোর্স কোড (GitHub)" value={pr.repo} onChange={(v) => proj.update(pr.id, { repo: v })} placeholder="github.com/you/repo" />
+            <label className="flex items-center gap-2 text-xs text-slate-600 sm:col-span-2">
+              <input type="checkbox" checked={pr.featured} onChange={(e) => proj.update(pr.id, { featured: e.target.checked })} />
+              ⭐ ফিচারড প্রজেক্ট (README ও পোর্টফোলিওতে আগে দেখাবে)
+            </label>
             <div className="sm:col-span-2">
               <Field label="বিবরণ (প্রতি লাইনে একটি পয়েন্ট)" textarea rows={3} value={pr.bullets} onChange={(v) => proj.update(pr.id, { bullets: v })} placeholder="What it does, your role, impact" />
             </div>
